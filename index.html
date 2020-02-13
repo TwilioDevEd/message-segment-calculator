@@ -14,13 +14,14 @@
   </body>
     <script type="text/javascript">
         var messageBox = document.getElementById('message');
-        var submitButton = document.getElementById('submit-button');
+        var lengthResult = document.getElementById('message-length');
 
         messageBox.oninput = logSubmit;
 
         function logSubmit(event){
             console.log("Button pressed");
             event.preventDefault();
+            lengthResult.textContent = event.target.value.length;
         };
     </script>
 </html>
