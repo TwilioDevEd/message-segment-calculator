@@ -11,17 +11,20 @@
         <input type="text" id="message" name="message">
 	</form>
 	<p>Message length: <span id="message-length"></span></p>
+	<p>Number of Segments: <span id="num-segments"></span></p>
   </body>
     <script type="text/javascript">
         var messageBox = document.getElementById('message');
         var lengthResult = document.getElementById('message-length');
+        var numSegmentsResult = document.getElementById('num-segments');
 
         messageBox.oninput = logSubmit;
 
         function logSubmit(event){
-            console.log("Button pressed");
-            event.preventDefault();
             lengthResult.textContent = event.target.value.length;
+            numSegmentsResult.textContent = calculateNumSegments(event.target.value);
+
+            event.preventDefault();
         };
     </script>
 </html>

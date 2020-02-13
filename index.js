@@ -1,13 +1,7 @@
-function calculateLength() {
-  var messageBody = document.getElementById("message");
+function calculateNumSegments(messageBodyText) {
+  var maxCharsInSegment = 160;
+  // Display one segment if message body length <  160
+  var numSegments = Math.floor(messageBodyText.length / maxCharsInSegment);
 
-  updateMessageLength(5);
-  // listener to update the length text
-}
-
-function updateMessageLength(length) {
-  // update the dom element
-  var messageLengthText = document.getElementById("message-length");
-
-  messageLengthText.appendChild = length;
+  return numSegments;
 }
