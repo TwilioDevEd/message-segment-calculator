@@ -2,8 +2,25 @@
 <html>
   <head>
     <title>Messaging Segment Calculator</title>
+    <script  type="text/javascript" src="./index.js"></script>
   </head>
   <body>
-    <p>This is an example paragraph. Anything in the <strong>body</strong> tag will appear on the page, just like this <strong>p</strong> tag and its contents.</p>
+	<h1>Messaging Segment Calculator</h1>
+	<form>
+		<label for="message">SMS Message </label>
+        <input type="text" id="message" name="message">
+	</form>
+	<p>Message length: <span id="message-length"></span></p>
   </body>
+    <script type="text/javascript">
+        var messageBox = document.getElementById('message');
+        var submitButton = document.getElementById('submit-button');
+
+        messageBox.oninput = logSubmit;
+
+        function logSubmit(event){
+            console.log("Button pressed");
+            event.preventDefault();
+        };
+    </script>
 </html>
