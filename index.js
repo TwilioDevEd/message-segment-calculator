@@ -138,14 +138,57 @@ const unicodeToGsm = {
     0x20AC: [0x1B, 0x65]
 }
 
-function buildSegments(messageBodyText) {
+function buildSegments(messageBodyText, encoding) {
+  if (encoding === 'GSM-7') {
+    return buildSegmentsGSM7(messageBodyText);
+  } else if (encoding === 'UCS-2') {
+    return buildSegmentsUCS2(messageBodyText);
+  } else {
+    console.log('Unsupported encoding');
+  }
+}
+
+function buildSegmentsUCS2(messageBodyText) {
+  // UCS-2 (2-byte Universal Character Set) is of fixed length
+  const maxBitsInSegment = 1120; // 140 octets -> 140 * 8bits
+  const twilioUserDataBits = 48; // 6 octets -> 6 * 8 bits
+  const maxUsableOctetsPerSegment = 134;  // (1120 - 48) / 8 -> 2 octets per UCS-2 char so 67 UCS-2 chars max per segment
+
+  let ucsEncodedChars = []
+  for (const char of messageBodyText) {
+    if (char.length === 2) {
+      ucsEncodedChars.push({raw: char, encoded: [char.charCodeAt(0), char.charCodeAt(1)]});
+    } else if (char.length === 1) {
+      ucsEncodedChars.push({raw: char, encoded: [0x00, char.charCodeAt(0)]});
+    }
+  }
+
+  // Building segments
+  let segments = [[]];
+  let currentSegmentIndex = 0;
+  let currentSegmentLength = 0;
+  for (const charInfo of ucsEncodedChars) {
+    if ((currentSegmentLength + charInfo.encoded.length) > maxUsableOctetsPerSegment) {
+      segments.push([]);
+      currentSegmentIndex++;
+      currentSegmentLength = 0;
+    }
+    let segment = segments[currentSegmentIndex];
+    segments[currentSegmentIndex].push(charInfo);
+    currentSegmentLength += charInfo.encoded.length;
+  }
+
+  return segments;
+}
+
+function buildSegmentsGSM7(messageBodyText) {
   // 1 octet == 1 byte == 8 bits
   // 1 char ASCII == 1 octet == 1 byte == 8 bits
   // 1 char GSM-7 SMS == 1 septet == 7 bits
 
-  var maxBitsInSegment = 1120; // 140 octets -> 140 * 8bits
-  var twilioUserDataBits = 48; // 6 octets -> 6 * 8 bits
-  var maxSeptetsInSegments = 153; // (1120 - 48) / 7 ~= 153 septets
+  const maxBitsInSegment = 1120; // 140 octets -> 140 * 8bits
+  const twilioUserDataBits = 48; // 6 octets -> 6 * 8 bits
+  const maxSeptetsInSegments = 153; // (1120 - 48) / 7 ~= 153 septets
   
   // Converting Javascript chars to GSM-7
   // Some chars like [ needs to be escaped in GSM-7
@@ -153,28 +196,53 @@ function buildSegments(messageBodyText) {
   // [ -> 0x5B for JS -> 0x1B (esc) 0x3C ([) GSM-7
   let gsmEncodedChars = []
   for (const char of messageBodyText) {
+    const codePoint = char.charCodeAt(0);
+    let gsmChars = undefined;
     if (char.length === 1) {
-      const codePoint = char.charCodeAt(0);
-      const gsmChars = unicodeToGsm[codePoint];
-      if (gsmChars !== undefined) {
-        gsmEncodedChars.push(gsmChars);
-      }
-    } else {
-      console.log('Char outside of BPM plane: ', char);
+      gsmChars = unicodeToGsm[codePoint];
     }
+    gsmEncodedChars.push({raw: char, encoded: gsmChars});
   }
 
   // Building segments
   let segments = [[]];
   let currentSegmentIndex = 0;
-  for (const gsmChars of gsmEncodedChars) {
-    if ((segments[currentSegmentIndex].length + gsmChars.length) > maxSeptetsInSegments) {
+  let currentSegmentLength = 0;
+  for (const charInfo of gsmEncodedChars) {
+    if (charInfo.encoded && (currentSegmentLength + charInfo.encoded.length) > maxSeptetsInSegments) {
       segments.push([]);
       currentSegmentIndex++;
+      currentSegmentLength = 0;
     }
     let segment = segments[currentSegmentIndex];
-    segments[currentSegmentIndex] = segment.concat(gsmChars);
+    segments[currentSegmentIndex].push(charInfo);
+    currentSegmentLength += (charInfo.encoded ? charInfo.encoded.length : 0);
   }
 
   return segments;
+}
+
+
+function ucs2decode(string) {
+  const output = [];
+  let counter = 0;
+  const length = string.length;
+  while (counter < length) {
+    const value = string.charCodeAt(counter++);
+    if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+      // It's a high surrogate, and there is a next character.
+      const extra = string.charCodeAt(counter++);
+      if ((extra & 0xFC00) == 0xDC00) { // Low surrogate.
+        output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+      } else {
+        // It's an unmatched surrogate; only append this code unit, in case the
+        // next code unit is the high surrogate of a surrogate pair.
+        output.push(value);
+        counter--;
+      }
+    } else {
+      output.push(value);
+    }
+  }
+  return output;
 }
