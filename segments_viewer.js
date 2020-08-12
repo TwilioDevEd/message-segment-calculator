@@ -16,7 +16,7 @@ class SegmentsViewer {
 
     createTwilioReservedCodeUnitBlock(segmentType) {
         let block = document.createElement("div");
-        block.setAttribute("class", `septet twilio ${segmentType}`);
+        block.setAttribute("class", `block twilio ${segmentType}`);
         let twilioLogo = this.twilioLogo.cloneNode();
         block.appendChild(twilioLogo);
         return block;
@@ -24,7 +24,7 @@ class SegmentsViewer {
 
     createCodeUnitBlock(codeUnit, segmentType, mapKey) {
         let block = document.createElement('div');
-        block.setAttribute('class', `septet ${segmentType}`);
+        block.setAttribute('class', `block ${segmentType}`);
 
         block.setAttribute("data-key", mapKey);
         this.blockMap.get(mapKey).push(block);
@@ -98,17 +98,13 @@ class MessageViewer {
 
     createCharBlock(encodedChar, segmentType, mapKey) {
         let block = document.createElement('div');
-        block.setAttribute('class', `char ${segmentType}`);
+        block.setAttribute('class', `block ${segmentType}`);
         if (!encodedChar.codeUnits) {
             block.classList.add('error');
         }
 
         block.setAttribute("data-key", mapKey);
         this.blockMap.set(mapKey, block);
-        // block.setAttribute("data-char-index", charIndex);
-        
-        // const key = `${segmentIndex}-${charIndex}`;
-        // segmentIndexMap.set(key, [block]);
 
         let span = document.createElement('span');
         span.textContent = encodedChar.raw.replace(' ', '\u00A0');

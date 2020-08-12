@@ -1,20 +1,66 @@
-h1 {
-    width: 100%;
-    text-align: center;
-}
 body {
     max-width: 100%;
     font-family: "Helvetica", sans-serif;
     font-size: 11pt;
 }
-.calc {
+
+h1 {
+    width: 100%;
+    text-align: center;
 }
-.other {
+
+#calculator-header {
+    background-color: #233659;
+    padding: 10px;
+}
+
+#message-box {
+    color: white;
+    margin-bottom: 10px;
+}
+
+#message-box > textarea {
+    resize: vertical;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 5em;
+}
+
+#information-box {
     display: grid;
-    grid-template:
-        "viewer viewer" auto
-        / 1fr 1fr;
+    grid-template-columns: repeat(5, auto);
+    column-gap: 10px;
+    grid-auto-flow: column;
+    grid-template-rows: auto auto;
+    justify-content: space-between;
 }
+#information-box > .label {
+    padding-top: 5px;
+    text-align: center;
+    font-size: small;
+    font-variant: all-petite-caps;
+    background-color: #233659;
+    color: white;
+}
+#information-box > .value {
+    padding-top: 5px;
+    font-size: medium;
+    text-align: center;
+    background-color: #233659;
+    color: white;
+    margin-bottom: 0;
+}
+
+#viewers {
+    background-color: #F9F9F9;
+    padding-top: 20px;
+}
+#viewers-inner {
+    color: black;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
 .label {
     display: block;
     font-size: small;
@@ -25,80 +71,61 @@ body {
     display: block;
     margin-bottom: 20px;
 }
-textarea {
-    resize: vertical;
-    width: 100%;
-    box-sizing: border-box;
-    min-height: 5em;
-}
-#encoding {
-    max-width: 100px;
-}
-#segments-viewer, #message-viewer {
+
+#message-viewer, #segments-viewer {
     line-height: 0.8;
 }
-.septet {
-    color: black;
-    font-size: 10px;
-    text-align: center;
 
-    display: inline-flex;
+.block {
     align-items: center;
-    justify-content: center;
-    width: 6ch;
-    height: 1em;
-
-    vertical-align: middle;
-
-    font-family: monospace;
-    padding: 4px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-    border-right: 1px solid rgba(0, 0, 0, 0.2);
-}
-.char {
     color: black;
-    font-size: 12px;
-    text-align: center;
-
     display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 2em;
-
-    vertical-align: middle;
-
     font-family: monospace;
+    justify-content: center;
+    text-align: center;
+    vertical-align: middle;
 }
-
-/*.char:first-child {
-    padding-left: 1ch;
+.block.selected {
+    color: white;
 }
-.char:last-child {
-    padding-right: 1ch;
-}*/
-.septet>span, .char>span {
+.block > span {
     cursor: default;
 }
-.septet.twilio > img {
+
+#message-viewer > .block {
+    font-size: 12px;
+    height: 2em;
+}
+#message-viewer > .block.error {
+    background-color: red;
+}
+
+#segments-viewer > .block {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    font-size: 10px;
+    height: 1em;
+    padding: 4px;
+    width: 6ch;
+}
+#segments-viewer > .block.twilio > img {
     display: inline;
     height: 1em;
 }
+
 
 .segment-type-0 {
     background-color: #CCE4FF;
 }
 .segment-type-0.selected {
     background-color: #0263E0;
-    color: white;
 }
 
 .segment-type-1 {
     background-color: #D1FAE0;
 }
-
 .segment-type-1.selected {
     background-color: #14B053;
-    color: white;
 }
 
 .segment-type-2 {
@@ -106,7 +133,6 @@ textarea {
 }
 .segment-type-2.selected {
     background-color: #F47C22;
-    color: white;
 }
 
 .segment-type-3 {
@@ -114,7 +140,6 @@ textarea {
 }
 .segment-type-3.selected {
     background-color: #E8B407;
-    color: white;
 }
 
 .segment-type-4 {
@@ -122,41 +147,4 @@ textarea {
 }
 .segment-type-4.selected {
     background-color: #6D2ED1;
-    color: white;
-}
-
-/*
-.septet.selected,.char.selected {
-    background-color: #233659;
-    color: white;
-}*/
-.char.error {
-    background-color: red;
-}
-
-.abox {
-    display: grid;
-    grid-template-columns: repeat(5, auto);
-    column-gap: 10px;
-    grid-auto-flow: column;
-    grid-template-rows: auto auto;
-    justify-content: space-between;
-}
-.abox > .label {
-    padding-top: 5px;
-
-    text-align: center;
-    font-size: small;
-    font-variant: all-petite-caps;
-    background-color: #233659;
-    color: white;
-}
-.abox > .value {
-    padding-top: 5px;
-    font-size: medium;
-    text-align: center;
-    background-color: #233659;
-    color: white;
-    margin-bottom: 0;
-    /*font-weight: bold;*/
 }

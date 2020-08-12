@@ -10,14 +10,14 @@
 
 <body>
   <h1>Messaging Segment Calculator</h1>
-  <div class="calc">
-    <div style="background-color: #233659; padding: 10px;">
-      <div style="background-color: #233659; color: white; margin-bottom: 10px;">
+  <div id="calculator">
+    <div id="calculator-header">
+      <div id="message-box">
         <label class="label" for="message">SMS Message </label>
         <textarea class="" type="text" id="message" name="message"></textarea>
       </div>
 
-      <div class="abox">
+      <div id="information-box">
 
         <span class="label">Encoding</span>
         <div class="value">
@@ -28,32 +28,32 @@
         </div>
 
         <span class="label">Number of Segments</span>
-        <span class="value" id="num-segments"></span>
+        <span class="value" id="segment-counter"></span>
 
         <span class="label">Glyph count</span>
-        <span class="value" id="message-length"></span>
+        <span class="value" id="glyph-counter"></span>
 
         <span class="label">Message size</span>
-        <span class="value" id="size-message"></span>
+        <span class="value" id="message-size-counter"></span>
 
         <span class="label">Total size sent</span>
-        <span class="value" id="total-size"></span>
+        <span class="value" id="total-size-counter"></span>
       </div>
     </div>
 
-    <div style="background-color: #F9F9F9; padding-top: 20px;">
-      <div style="color: black; padding: 5px; margin-bottom: 10px;">
+    <div id="viewers">
+      <div id="viewers-inner">
 
         <span class="label">Message Parsed</span>
         <span class="value">
-          <span class="" id="message-blocks">
+          <span id="message-blocks">
             <div id="message-viewer"></div>
           </span>
         </span>
 
         <span class="label">Segments</span>
         <span class="value">
-          <span class="" id="segments-blocks">
+          <span id="segments-blocks">
             <div id="segments-viewer"></div>
           </span>
         </span>
@@ -72,10 +72,10 @@
     const segmentsViewer = new SegmentsViewer(document.getElementById('segments-viewer'), 5);
 
     const counters = {
-      segments: document.getElementById('num-segments'),
-      glyphs: document.getElementById('message-length'),
-      messageSize: document.getElementById('size-message'),
-      totalSize: document.getElementById('total-size')
+      segments: document.getElementById('segment-counter'),
+      glyphs: document.getElementById('glyph-counter'),
+      messageSize: document.getElementById('message-size-counter'),
+      totalSize: document.getElementById('total-size-counter')
     };
 
     function updateCalculator() {
@@ -94,7 +94,7 @@
     }
 
     function selectBlocks(event) {
-      const block = event.target.closest('.char,.septet');
+      const block = event.target.closest('.block');
       if (block) {
         const mapKey = block.getAttribute("data-key");
 
