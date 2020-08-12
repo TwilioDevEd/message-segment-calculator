@@ -30,8 +30,8 @@
         <span class="label">Number of Segments</span>
         <span class="value" id="segment-counter"></span>
 
-        <span class="label">Glyph count</span>
-        <span class="value" id="glyph-counter"></span>
+        <span class="label">Number of unicode scalars</span>
+        <span class="value" id="unicode-char-counter"></span>
 
         <span class="label">Message size</span>
         <span class="value" id="message-size-counter"></span>
@@ -73,7 +73,7 @@
 
     const counters = {
       segments: document.getElementById('segment-counter'),
-      glyphs: document.getElementById('glyph-counter'),
+      unicodeCharCounter: document.getElementById('unicode-char-counter'),
       messageSize: document.getElementById('message-size-counter'),
       totalSize: document.getElementById('total-size-counter')
     };
@@ -85,7 +85,7 @@
       const segmentedMessage = new SegmentedMessage(messageBodyText, encoding);
 
       counters.segments.textContent = segmentedMessage.segments.length;
-      counters.glyphs.textContent = ucs2decode(messageBodyText).length
+      counters.unicodeCharCounter.textContent = [...messageBodyText].length;
       counters.messageSize.textContent = `${segmentedMessage.messageSize} bits`;
       counters.totalSize.textContent = `${segmentedMessage.totalSize} bits`;
 

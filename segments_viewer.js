@@ -133,6 +133,16 @@ class MessageViewer {
 
         this.node.replaceWith(newMessage);
         this.node = newMessage;
+
+        this.markInvisibleCharacters();
+    }
+
+    markInvisibleCharacters() {
+        for (let span of this.node.querySelectorAll("span")) {
+            if (span.offsetWidth === 0) {
+                span.classList.add("invisible");
+            }
+        }
     }
 
     select(mapKey) {

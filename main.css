@@ -91,6 +91,9 @@ h1 {
 .block > span {
     cursor: default;
 }
+.block > span.invisible::before {
+    content: "•";
+}
 
 #message-viewer > .block {
     font-size: 12px;
