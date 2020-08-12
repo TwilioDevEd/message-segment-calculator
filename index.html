@@ -1,316 +1,126 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Messaging Segment Calculator</title>
-    <script type="text/javascript" src="./index.js"></script>
-    <style>
-        h1 {
-            width: 100%;
-            text-align: center;
-        }
-        body {
-            max-width: 100%;
-            font-family: "Helvetica", sans-serif;
-            font-size: 11pt;
-        }
-        .calc {
-            display: grid;
-            grid-template:
-                [row-start] "label textarea" 100px [row-end]
-                [row-start] "label value" 25px [row-end]
-                / auto 1fr;
-            gap: 10px;
-            align-items: center;
-        }
-        .other {
-            display: grid;
-            grid-template:
-                "viewer viewer" auto
-                / 1fr 1fr;
-        }
-        .label {
-            text-align: right;
-        }
-        textarea {
-            height: 100%;
-        }
-        #encoding {
-            max-width: 100px;
-        }
-        #segments-viewer, #message-viewer {
-            line-height: 0.8;
-        }
-        .septet {
-            color: black;
-            font-size: 10px;
-            text-align: center;
+<head>
+  <meta charset="utf-8">
+  <title>Messaging Segment Calculator</title>
+  <link rel="stylesheet" href="./main.css">
+  <script type="text/javascript" src="./segments_calculator.js"></script>
+  <script type="text/javascript" src="./segments_viewer.js"></script>
+</head>
 
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 6ch;
-            height: 1em;
-
-            vertical-align: middle;
-
-            font-family: monospace;
-            padding: 4px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-            border-right: 1px solid rgba(0, 0, 0, 0.2);
-        }
-        .char {
-            color: black;
-            font-size: 12px;
-            text-align: center;
-
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            height: 2em;
-
-            vertical-align: middle;
-
-            font-family: monospace;
-        }
-
-        /*.char:first-child {
-            padding-left: 1ch;
-        }
-        .char:last-child {
-            padding-right: 1ch;
-        }*/
-        .septet>span, .char>span {
-            cursor: default;
-        }
-        .septet.twilio > img {
-            display: inline;
-            height: 1em;
-        }
-
-        .segment-type-0 {
-            background-color: #CCE4FF;
-        }
-        .segment-type-0.selected {
-            background-color: #0263E0;
-            color: white;
-        }
-
-        .segment-type-1 {
-            background-color: #D1FAE0;
-        }
-
-        .segment-type-1.selected {
-            background-color: #14B053;
-            color: white;
-        }
-
-        .segment-type-2 {
-            background-color: #FDDCC4;
-        }
-        .segment-type-2.selected {
-            background-color: #F47C22;
-            color: white;
-        }
-
-        .segment-type-3 {
-            background-color: #FFF1B3;
-        }
-        .segment-type-3.selected {
-            background-color: #E8B407;
-            color: white;
-        }
-
-        .segment-type-4 {
-           background-color: #E7DCFA;
-        }
-        .segment-type-4.selected {
-            background-color: #6D2ED1;
-            color: white;
-        }
-
-/*
-        .septet.selected,.char.selected {
-            background-color: #233659;
-            color: white;
-        }*/
-        .char.error {
-            background-color: red;
-        }
-    </style>
-  </head>
-  <body>
-    <h1>Messaging Segment Calculator</h1>
-    <div class="calc">
+<body>
+  <h1>Messaging Segment Calculator</h1>
+  <div class="calc">
+    <div style="background-color: #233659; padding: 10px;">
+      <div style="background-color: #233659; color: white; margin-bottom: 10px;">
         <label class="label" for="message">SMS Message </label>
-        <textarea class="value" type="text" id="message" name="message"></textarea>
-        
-        <span class="label">Encoding:</span>
-        <select class="value" id="encoding">
+        <textarea class="" type="text" id="message" name="message"></textarea>
+      </div>
+
+      <div class="abox">
+
+        <span class="label">Encoding</span>
+        <div class="value">
+          <select class="not-really-value" id="encoding">
             <option value="GSM-7">GSM-7</option>
             <option value="UCS-2">UCS-2</option>
-        </select>
+          </select>
+        </div>
 
-        <span class="label">Number of Segments:</span>
+        <span class="label">Number of Segments</span>
         <span class="value" id="num-segments"></span>
 
-        <span class="label">Number of glyphs in message:</span>
+        <span class="label">Glyph count</span>
         <span class="value" id="message-length"></span>
 
-        <span class="label">Size in bits of the message:</span>
+        <span class="label">Message size</span>
         <span class="value" id="size-message"></span>
 
-        <span class="label">Total size in bits that will be sent:</span>
+        <span class="label">Total size sent</span>
         <span class="value" id="total-size"></span>
-
-        <span class="label">Message Parsed:</span>
-        <span class="value">
-            <span class="" id="message-sent">
-                <div id="message-viewer"></div>
-            </span>
-        </span>
-
-        <span class="label">Segments:</span>
-        <span class="value">
-            <span class="" id="segments">
-                <div id="segments-viewer"></div>
-            </span>
-        </span>
+      </div>
     </div>
 
-  </body>
-    <script type="text/javascript">
-        const segmentTypesCount = 5;
-        const messageBox = document.getElementById('message');
-        const encodingSelect = document.getElementById('encoding');
-        const lengthResult = document.getElementById('message-length');
-        const numSegmentsResult = document.getElementById('num-segments');
-        const sizeMessageResult = document.getElementById('size-message');
-        const totalSizeResult = document.getElementById('total-size');
+    <div style="background-color: #F9F9F9; padding-top: 20px;">
+      <div style="color: black; padding: 5px; margin-bottom: 10px;">
 
-        messageBox.oninput = (event) => {
-            updateSegments();
-            event.preventDefault();
-        };
+        <span class="label">Message Parsed</span>
+        <span class="value">
+          <span class="" id="message-blocks">
+            <div id="message-viewer"></div>
+          </span>
+        </span>
 
-        // Not supported IE 11
-        encodingSelect.onchange = (event) => {updateSegments();};
+        <span class="label">Segments</span>
+        <span class="value">
+          <span class="" id="segments-blocks">
+            <div id="segments-viewer"></div>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
 
-        function clearSelection(event) {
-            for (const block of document.querySelectorAll('div.selected')) {
-                block.classList.remove('selected');
-            }
+  <script>
+    const messageBox = document.getElementById('message');
+    const encodingSelect = document.getElementById('encoding');
+
+    const messageViewerBox = document.getElementById('message-blocks');
+    const segmentsViewerBox = document.getElementById('segments-blocks');
+
+    const messageViewer = new MessageViewer(document.getElementById('message-viewer'), 5);
+    const segmentsViewer = new SegmentsViewer(document.getElementById('segments-viewer'), 5);
+
+    const counters = {
+      segments: document.getElementById('num-segments'),
+      glyphs: document.getElementById('message-length'),
+      messageSize: document.getElementById('size-message'),
+      totalSize: document.getElementById('total-size')
+    };
+
+    function updateCalculator() {
+      const messageBodyText = messageBox.value;
+      const encoding = encodingSelect.value;
+
+      const segmentedMessage = new SegmentedMessage(messageBodyText, encoding);
+
+      counters.segments.textContent = segmentedMessage.segments.length;
+      counters.glyphs.textContent = ucs2decode(messageBodyText).length
+      counters.messageSize.textContent = `${segmentedMessage.messageSize} bits`;
+      counters.totalSize.textContent = `${segmentedMessage.totalSize} bits`;
+
+      messageViewer.update(segmentedMessage);
+      segmentsViewer.update(segmentedMessage);
+    }
+
+    function selectBlocks(event) {
+      const block = event.target.closest('.char,.septet');
+      if (block) {
+        const mapKey = block.getAttribute("data-key");
+
+        if (mapKey) {
+          messageViewer.select(mapKey);
+          segmentsViewer.select(mapKey);
         }
+      }
+    }
 
-        document.getElementById('message-sent').onmouseout = clearSelection;
-        document.getElementById('segments').onmouseout = clearSelection;
-        document.getElementById('message-sent').addEventListener('mouseover', setHover);
-        document.getElementById('segments').addEventListener('mouseover', setHover);
+    function clearSelection(event) {
+      messageViewer.clearSelection();
+      segmentsViewer.clearSelection();
+    }
 
-        function setHover(event) {
-            for (const block of document.querySelectorAll('div.selected')) {
-                block.classList.remove('selected');
-            }
+    messageBox.oninput = (event) => { updateCalculator(); };
+    encodingSelect.onchange = (event) => { updateCalculator(); };
 
-            const block = event.target.closest('.char,.septet');
+    messageViewerBox.onmouseout = clearSelection;
+    segmentsViewerBox.onmouseout = clearSelection;
 
-            if (block && block.getAttribute('data-selectable') !== '0') {
-                const key = `${block.dataset.segmentIndex}-${block.dataset.charIndex}`;
-                // const blocks = document.getElementById('other').querySelectorAll(`.septet[data-segment-index="${block.dataset.segmentIndex}"][data-char-index="${block.dataset.charIndex}"]`);
-                for (const block of segmentIndexMap.get(key)) {
-                    block.classList.add('selected');
-                }
-            }
-        }
+    messageViewerBox.onmouseover = selectBlocks;
+    segmentsViewerBox.onmouseover = selectBlocks;
 
-        let segmentIndexMap = new Map();
+    updateCalculator();
+  </script>
 
-        function updateSegments() {
-            const messageBodyText = messageBox.value;
-            const encoding = encodingSelect.value;
-
-            const segments = buildSegments(messageBodyText, encoding);
-            lengthResult.textContent = ucs2decode(messageBodyText).length;
-            numSegmentsResult.textContent = segments.length;
-
-            var newMessageViewer = document.createElement('div');
-            newMessageViewer.setAttribute('id', 'message-viewer')
-
-            var newSegments = document.createElement('div');
-            newSegments.setAttribute('id', 'segments-viewer');
-
-
-            let totalSize = 0;
-            let messageSize = 0;
-            segmentIndexMap.clear();
-
-            for (let segmentIndex = 0; segmentIndex < segments.length; segmentIndex++) {
-                const segmentType = `segment-type-${segmentIndex % segmentTypesCount}`;
-                const segment = segments[segmentIndex];
-
-                for (let i = 0; i < 6; i++) {
-                    var septetdiv = document.createElement('div');
-                    septetdiv.setAttribute('class', `septet twilio ${segmentType}`);
-                    septetdiv.setAttribute('data-selectable', 0);
-                    let twilioLogo = createTwilioLogo();
-                    septetdiv.appendChild(twilioLogo);
-                    newSegments.appendChild(septetdiv);
-                }
-                totalSize += 6 * 8;
-
-                for (let charIndex = 0; charIndex < segment.length; charIndex++) {
-                    const septet = segment[charIndex];
-
-                    let chardiv = document.createElement('div');
-                    chardiv.setAttribute('class', 'char');
-                    chardiv.dataset.segmentIndex = segmentIndex;
-                    chardiv.dataset.charIndex = charIndex;
-                    const key = `${segmentIndex}-${charIndex}`;
-                    segmentIndexMap.set(key, [chardiv]);
-                    chardiv.classList.add(segmentType);
-                    let span = document.createElement('span');
-                    span.textContent = septet.raw.replace(' ', '\u00A0')
-                    chardiv.appendChild(span);
-                    newMessageViewer.appendChild(chardiv);
-
-                    if (septet.encoded) {
-                        for (const codePoint of septet.encoded) {
-                            var septetdiv = document.createElement('div');
-                            septetdiv.setAttribute('class', 'septet');
-                            septetdiv.classList.add(segmentType);
-                            septetdiv.dataset.segmentIndex = segmentIndex;
-                            septetdiv.dataset.charIndex = charIndex;
-                            segmentIndexMap.get(key).push(septetdiv);
-                            let span = document.createElement('span');
-                            span.textContent = "0x" + codePoint.toString(16).padStart(4, '0').toUpperCase();
-                            messageSize += (encoding === 'GSM-7' ? 7 : 8);
-                            septetdiv.appendChild(span);
-                            newSegments.appendChild(septetdiv);
-                        }
-                    } else {
-                        chardiv.classList.add('error');
-                    }
-                }
-            }
-            totalSize += messageSize;
-
-            let messageViewer = document.getElementById('message-viewer');
-            messageViewer.replaceWith(newMessageViewer);
-
-            let segmentsViewer = document.getElementById('segments-viewer');
-            segmentsViewer.replaceWith(newSegments);
-
-            totalSizeResult.textContent = totalSize + ' bits';
-            sizeMessageResult.textContent = messageSize + ' bits';
-        }
-
-        function createTwilioLogo() {
-            let img = document.createElement('img');
-            const twilio_logo = '<svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" preserveAspectRatio="xMidYMid meet"><path d="M15 0C6.7 0 0 6.7 0 15s6.7 15 15 15 15-6.7 15-15S23.3 0 15 0zm0 26C8.9 26 4 21.1 4 15S8.9 4 15 4s11 4.9 11 11-4.9 11-11 11zm6.8-14.7c0 1.7-1.4 3.1-3.1 3.1s-3.1-1.4-3.1-3.1 1.4-3.1 3.1-3.1 3.1 1.4 3.1 3.1zm0 7.4c0 1.7-1.4 3.1-3.1 3.1s-3.1-1.4-3.1-3.1c0-1.7 1.4-3.1 3.1-3.1s3.1 1.4 3.1 3.1zm-7.4 0c0 1.7-1.4 3.1-3.1 3.1s-3.1-1.4-3.1-3.1c0-1.7 1.4-3.1 3.1-3.1s3.1 1.4 3.1 3.1zm0-7.4c0 1.7-1.4 3.1-3.1 3.1S8.2 13 8.2 11.3s1.4-3.1 3.1-3.1 3.1 1.4 3.1 3.1z"/></svg>';
-            img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(twilio_logo));
-            return img;
-        }
-
-        updateSegments(messageBox.value)
-    </script>
+</body>
 </html>
