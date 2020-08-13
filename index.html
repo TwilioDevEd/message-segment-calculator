@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>Messaging Segment Calculator</title>
   <link rel="stylesheet" href="./main.css">
+  <script type="text/javascript" src="./grapheme-splitter.js"></script>
   <script type="text/javascript" src="./segments_calculator.js"></script>
   <script type="text/javascript" src="./segments_viewer.js"></script>
 </head>
@@ -27,11 +28,14 @@
           </select>
         </div>
 
-        <span class="label">Number of Segments</span>
+        <span class="label">Number of segments</span>
         <span class="value" id="segment-counter"></span>
 
-        <span class="label">Number of unicode scalars</span>
+        <span class="label">Number of characters</span>
         <span class="value" id="unicode-char-counter"></span>
+
+        <span class="label">Number of Unicode scalars</span>
+        <span class="value" id="unicode-scalar-counter"></span>
 
         <span class="label">Message size</span>
         <span class="value" id="message-size-counter"></span>
@@ -62,6 +66,7 @@
   </div>
 
   <script>
+    const graphemeSplitter = new GraphemeSplitter();
     const messageBox = document.getElementById('message');
     const encodingSelect = document.getElementById('encoding');
 
@@ -74,6 +79,7 @@
     const counters = {
       segments: document.getElementById('segment-counter'),
       unicodeCharCounter: document.getElementById('unicode-char-counter'),
+      unicodeScalarCounter: document.getElementById('unicode-scalar-counter'),
       messageSize: document.getElementById('message-size-counter'),
       totalSize: document.getElementById('total-size-counter')
     };
@@ -82,10 +88,11 @@
       const messageBodyText = messageBox.value;
       const encoding = encodingSelect.value;
 
-      const segmentedMessage = new SegmentedMessage(messageBodyText, encoding);
+      const segmentedMessage = new SegmentedMessage(messageBodyText, encoding, graphemeSplitter);
 
       counters.segments.textContent = segmentedMessage.segments.length;
-      counters.unicodeCharCounter.textContent = [...messageBodyText].length;
+      counters.unicodeCharCounter.textContent = graphemeSplitter.countGraphemes(messageBodyText);
+      counters.unicodeScalarCounter.textContent = [...messageBodyText].length;
       counters.messageSize.textContent = `${segmentedMessage.messageSize} bits`;
       counters.totalSize.textContent = `${segmentedMessage.totalSize} bits`;
 

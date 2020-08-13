@@ -221,8 +221,9 @@ class GSM7EncodedChar extends EncodedChar {
 // UCS-2 is of fixed length and requires 2 code units per character
 // a UCS-2 code unit is an octet (8bits)
 class UCS2EncodedChar extends EncodedChar {
-  constructor(char) {
+  constructor(char, graphemeSize) {
     super(char);
+    this.graphemeSize = graphemeSize === undefined ? 1 : graphemeSize;
 
     if (char.length === 2) {
       this.codeUnits = [char.charCodeAt(0), char.charCodeAt(1)];
@@ -236,7 +237,7 @@ class UCS2EncodedChar extends EncodedChar {
   }
 
   sizeInBits() {
-    return 16; // UCS-2 characters are always 2 code units -> 16bits
+    return 16 * this.graphemeSize; // UCS-2 characters are always 2 code units -> 16bits
   }
 }
 
@@ -286,8 +287,9 @@ class Segment extends Array {
  ***************************************************************************/
 
 class SegmentedMessage {
-  constructor(message, encoding) {
+  constructor(message, encoding, graphemeSplitter) {
     this.charClass = this.charClassForEncoding(encoding);
+    this.splitter = graphemeSplitter;
     this.segments = [];
 
     const encodedChars = this.encodeChars(message);
@@ -295,7 +297,7 @@ class SegmentedMessage {
 
     for (const encodedChar of encodedChars) {
       if (currentSegment === null || currentSegment.freeSizeInBits() < encodedChar.sizeInBits()) {
-        currentSegment = new Segment(true);
+        currentSegment = new Segment(currentSegment !== null);
         this.segments.push(currentSegment);
       }
       currentSegment.push(encodedChar);
@@ -314,8 +316,15 @@ class SegmentedMessage {
 
   encodeChars(message) {
     let encodedChars = [];
-    for (const char of message) {
-      encodedChars.push(new this.charClass(char));
+    for (const char of this.splitter.iterateGraphemes(message)) {
+      if (char.length <= 2) {
+        encodedChars.push(new this.charClass(char));
+      } else {
+        const parts = [...char];
+        for (let i = 0; i < parts.length; i++) {
+          encodedChars.push(new this.charClass(parts[i], (i===0?parts.length:0)));
+        }
+      }
     }
     return encodedChars;
   }
