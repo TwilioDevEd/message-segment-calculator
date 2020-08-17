@@ -290,18 +290,30 @@ class SegmentedMessage {
   constructor(message, encoding, graphemeSplitter) {
     this.charClass = this.charClassForEncoding(encoding);
     this.splitter = graphemeSplitter;
-    this.segments = [];
 
     const encodedChars = this.encodeChars(message);
+    this.segments = this.buildSegments(encodedChars);
+  }
+
+  buildSegments(encodedChars, useTwilioReservedBits) {
+    let segments = [];
+    const hasTwilioReservedBits = (useTwilioReservedBits === true);
     let currentSegment = null;
 
     for (const encodedChar of encodedChars) {
       if (currentSegment === null || currentSegment.freeSizeInBits() < encodedChar.sizeInBits()) {
-        currentSegment = new Segment(currentSegment !== null);
-        this.segments.push(currentSegment);
+        
+        if (currentSegment && hasTwilioReservedBits === false) {
+          return this.buildSegments(encodedChars, true);
+        }
+
+        currentSegment = new Segment(hasTwilioReservedBits);
+        segments.push(currentSegment);
       }
       currentSegment.push(encodedChar);
     }
+
+    return segments;
   }
 
   charClassForEncoding(encoding) {
