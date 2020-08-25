@@ -289,9 +289,15 @@ class Segment extends Array {
 class SegmentedMessage {
   constructor(message, encoding, graphemeSplitter) {
     this.charClass = this.charClassForEncoding(encoding);
+    this.encoding = encoding;
     this.splitter = graphemeSplitter;
 
-    const encodedChars = this.encodeChars(message);
+    let encodedChars = this.encodeChars(message);
+    if (encoding === "auto" && this.hasIncompatibleEncoding(encodedChars)) {
+      this.charClass = UCS2EncodedChar;
+      encodedChars = this.encodeChars(message);
+    }
+
     this.segments = this.buildSegments(encodedChars);
   }
 
@@ -321,9 +327,30 @@ class SegmentedMessage {
       return GSM7EncodedChar;
     } else if (encoding === "UCS-2") {
       return UCS2EncodedChar;
+    } else if (encoding === "auto") {
+      return GSM7EncodedChar;
     } else {
       throw "Unsupported encoding";
     }
+  }
+
+  getEncodingName() {
+    if (this.charClass === GSM7EncodedChar) {
+      return "GSM-7";
+    } else if (this.charClass === UCS2EncodedChar) {
+      return "UCS-2";
+    } else {
+      return "Unkown";
+    }
+  }
+
+  hasIncompatibleEncoding(encodedChars) {
+    for (const encodedChar of encodedChars) {
+      if (!encodedChar.codeUnits) {
+        return true;
+      }
+    }
+    return false;
   }
 
   encodeChars(message) {

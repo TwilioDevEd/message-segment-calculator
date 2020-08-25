@@ -151,3 +151,17 @@ h1 {
 .segment-type-4.selected {
     background-color: #6D2ED1;
 }
+
+
+.recently-changed {
+    animation: pulseHighlight 1s ease-out infinite;
+}
+
+@keyframes pulseHighlight {
+  0% {
+    color: yellow;
+  }
+  100% {
+    color: white;
+  }
+}

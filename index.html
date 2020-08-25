@@ -23,10 +23,14 @@
         <span class="label">Encoding</span>
         <div class="value">
           <select class="not-really-value" id="encoding">
+            <option value="auto">Automatic</option>
             <option value="GSM-7">GSM-7</option>
             <option value="UCS-2">UCS-2</option>
           </select>
         </div>
+
+        <span class="label">Encoding Used</span>
+        <span class="value" id="encoding-used"></span>
 
         <span class="label">Number of segments</span>
         <span class="value" id="segment-counter"></span>
@@ -69,6 +73,7 @@
     const graphemeSplitter = new GraphemeSplitter();
     const messageBox = document.getElementById('message');
     const encodingSelect = document.getElementById('encoding');
+    const encodingUsed = document.getElementById('encoding-used');
 
     const messageViewerBox = document.getElementById('message-blocks');
     const segmentsViewerBox = document.getElementById('segments-blocks');
@@ -89,6 +94,12 @@
       const encoding = encodingSelect.value;
 
       const segmentedMessage = new SegmentedMessage(messageBodyText, encoding, graphemeSplitter);
+
+      if (encodingUsed.textContent !== segmentedMessage.getEncodingName()) {
+        encodingUsed.textContent = segmentedMessage.getEncodingName();
+        encodingUsed.classList.add('recently-changed');
+        setTimeout(() => {encodingUsed.classList.remove('recently-changed');}, 3000);
+      }
 
       counters.segments.textContent = segmentedMessage.segments.length;
       counters.unicodeCharCounter.textContent = graphemeSplitter.countGraphemes(messageBodyText);
