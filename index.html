@@ -96,6 +96,8 @@
       const segmentedMessage = new SegmentedMessage(messageBodyText, encoding, graphemeSplitter);
 
       if (encodingUsed.textContent !== segmentedMessage.getEncodingName()) {
+        messageViewerBox.setAttribute('data-encoding', segmentedMessage.getEncodingName());
+        segmentsViewerBox.setAttribute('data-encoding', segmentedMessage.getEncodingName());
         encodingUsed.textContent = segmentedMessage.getEncodingName();
         encodingUsed.classList.add('recently-changed');
         setTimeout(() => {encodingUsed.classList.remove('recently-changed');}, 3000);

@@ -116,40 +116,80 @@ h1 {
     height: 1em;
 }
 
-
-.segment-type-0 {
+/********************************/
+/* GSM-7 Segments Color Palette */
+/********************************/
+[data-encoding="GSM-7"] .segment-type-0 {
     background-color: #CCE4FF;
 }
-.segment-type-0.selected {
+[data-encoding="GSM-7"] .segment-type-0.selected {
     background-color: #0263E0;
 }
 
-.segment-type-1 {
+[data-encoding="GSM-7"] .segment-type-1 {
     background-color: #D1FAE0;
 }
-.segment-type-1.selected {
+[data-encoding="GSM-7"] .segment-type-1.selected {
     background-color: #14B053;
 }
 
-.segment-type-2 {
+[data-encoding="GSM-7"] .segment-type-2 {
     background-color: #FDDCC4;
 }
-.segment-type-2.selected {
+[data-encoding="GSM-7"] .segment-type-2.selected {
     background-color: #F47C22;
 }
 
-.segment-type-3 {
+[data-encoding="GSM-7"] .segment-type-3 {
     background-color: #FFF1B3;
 }
-.segment-type-3.selected {
+[data-encoding="GSM-7"] .segment-type-3.selected {
     background-color: #E8B407;
 }
 
-.segment-type-4 {
+[data-encoding="GSM-7"] .segment-type-4 {
    background-color: #E7DCFA;
 }
-.segment-type-4.selected {
+[data-encoding="GSM-7"] .segment-type-4.selected {
     background-color: #6D2ED1;
+}
+
+/********************************/
+/* UCS-2 Segments Color Palette */
+/********************************/
+[data-encoding="UCS-2"] .segment-type-0 {
+    background-color: #FFF1B3;
+}
+[data-encoding="UCS-2"] .segment-type-0.selected {
+    background-color: #E8B407;
+}
+
+[data-encoding="UCS-2"] .segment-type-1 {
+    background-color: #E7DCFA;
+}
+[data-encoding="UCS-2"] .segment-type-1.selected {
+    background-color: #6D2ED1;
+}
+
+[data-encoding="UCS-2"] .segment-type-2 {
+    background-color: #CCE4FF;
+}
+[data-encoding="UCS-2"] .segment-type-2.selected {
+    background-color: #0263E0;
+}
+
+[data-encoding="UCS-2"] .segment-type-3 {
+    background-color: #D1FAE0;
+}
+[data-encoding="UCS-2"] .segment-type-3.selected {
+    background-color: #14B053;
+}
+
+[data-encoding="UCS-2"] .segment-type-4 {
+   background-color: #FDDCC4;
+}
+[data-encoding="UCS-2"] .segment-type-4.selected {
+    background-color: #F47C22;
 }
 
 
