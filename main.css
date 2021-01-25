@@ -192,6 +192,9 @@ h1 {
     background-color: #F47C22;
 }
 
+.block.non-gsm {
+  color: red;
+}
 
 .recently-changed {
     animation: pulseHighlight 1s ease-out infinite;
@@ -205,3 +208,24 @@ h1 {
     color: white;
   }
 }
+
+/********************************/
+/* Legend                       */
+/********************************/
+.legend {
+    font-size: 10px;
+    background-color: #f9f9f9;
+    padding: 0px 0px 5px 5px;
+}
+
+.legend-block {
+    display: inline;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    font-size: 10px;
+    height: 1em;
+    padding: 4px;
+    width: 6ch;
+    vertical-align: middle;
+    font-family: monospace;
+  }
+  
