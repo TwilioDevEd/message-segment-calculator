@@ -162,6 +162,7 @@ class EncodedChar {
   constructor(char) {
     this.raw = char;
     this.codeUnits = null;
+    this.isGSM7 = char && unicodeToGsm[char.charCodeAt(0)] ? true : false;
   }
 
   sizeInBits() {
