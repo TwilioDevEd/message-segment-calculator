@@ -22,9 +22,9 @@ class SegmentsViewer {
         return block;
     }
 
-    createCodeUnitBlock(codeUnit, segmentType, mapKey, isGSM7) {
+    createCodeUnitBlock(codeUnit, segmentType, mapKey) {
         let block = document.createElement('div');
-        block.setAttribute('class', `block ${segmentType} ${isGSM7 ? '' : 'non-gsm'}`);
+        block.setAttribute('class', `block ${segmentType}`);
 
         block.setAttribute("data-key", mapKey);
         this.blockMap.get(mapKey).push(block);
@@ -57,7 +57,7 @@ class SegmentsViewer {
                     if (encodedChar.codeUnits) {
                         for (const codeUnit of encodedChar.codeUnits) {
                             newSegments.appendChild(
-                                this.createCodeUnitBlock(codeUnit, segmentType, mapKey, encodedChar.isGSM7)
+                                this.createCodeUnitBlock(codeUnit, segmentType, mapKey)
                             );
                         }
                     }
