@@ -22,9 +22,9 @@ class SegmentsViewer {
         return block;
     }
 
-    createCodeUnitBlock(codeUnit, segmentType, mapKey) {
+    createCodeUnitBlock(codeUnit, segmentType, mapKey, isGSM7) {
         let block = document.createElement('div');
-        block.setAttribute('class', `block ${segmentType}`);
+        block.setAttribute('class', `block ${segmentType} ${isGSM7 ? '' : 'non-gsm'}`);
 
         block.setAttribute("data-key", mapKey);
         this.blockMap.get(mapKey).push(block);
@@ -51,13 +51,13 @@ class SegmentsViewer {
                 const mapKey = `${segmentIndex}-${charIndex}`;
                 this.blockMap.set(mapKey, []);
 
-                if (encodedChar instanceof TwilioReservedChar) {
+                if (encodedChar.isReservedChar) {
                     newSegments.appendChild(this.createTwilioReservedCodeUnitBlock(segmentType));
                 } else {
                     if (encodedChar.codeUnits) {
                         for (const codeUnit of encodedChar.codeUnits) {
                             newSegments.appendChild(
-                                this.createCodeUnitBlock(codeUnit, segmentType, mapKey)
+                                this.createCodeUnitBlock(codeUnit, segmentType, mapKey, encodedChar.isGSM7)
                             );
                         }
                     }
@@ -125,7 +125,7 @@ class MessageViewer {
                 const encodedChar = segment[charIndex];
                 const mapKey = `${segmentIndex}-${charIndex}`;
 
-                if (!(encodedChar instanceof TwilioReservedChar)) {
+                if (!(encodedChar.isReservedChar)) {
                     newMessage.appendChild(this.createCharBlock(encodedChar, segmentType, mapKey));
                 }
             }

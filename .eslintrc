@@ -1,0 +1,6 @@
+{
+    "extends": [
+      "twilio-ts"
+    ],
+    "ignorePatterns": ["docs/*", "*.js"]
+  }
