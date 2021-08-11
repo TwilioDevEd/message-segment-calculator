@@ -9,15 +9,26 @@ type EncodedChars = Array<EncodedChar>;
 
 const validEncodingValues = ['GSM-7', 'UCS-2', 'auto'];
 
+/**
+ * Class representing a segmented SMS
+ */
 export class SegmentedMessage {
   encoding: SmsEncoding | 'auto';
 
-  segments: any;
+  segments: Segment[];
 
   graphemes: string[];
 
   encodingName: SmsEncoding;
 
+  /**
+   *
+   * Create a new segmented message from a string
+   *
+   * @param {string} message Body of the message
+   * @param {boolean} [encoding] Optional: encoding. It vcan be 'GSM-7', 'UCS-2', 'auto'. Default value: 'auto'
+   *
+   */
   constructor(message: string, encoding: SmsEncoding | 'auto' = 'auto') {
     const splitter = new GraphemeSplitter();
 
@@ -30,7 +41,7 @@ export class SegmentedMessage {
     this.graphemes = splitter.splitGraphemes(message);
     this.encoding = encoding;
 
-    if (this.hasAnyUCSCharacters(this.graphemes)) {
+    if (this._hasAnyUCSCharacters(this.graphemes)) {
       if (encoding === 'GSM-7') {
         throw new Error('The string provided is incompatible with GSM-7 encoding');
       }
@@ -39,11 +50,17 @@ export class SegmentedMessage {
       this.encodingName = 'GSM-7';
     }
 
-    const encodedChars: EncodedChars = this.encodeChars(this.graphemes);
-    this.segments = this.buildSegments(encodedChars);
+    const encodedChars: EncodedChars = this._encodeChars(this.graphemes);
+    this.segments = this._buildSegments(encodedChars);
   }
 
-  hasAnyUCSCharacters(graphemes: string[]): boolean {
+  /**
+   * Internal method to check if the message has any non-GSM7 characters
+   *
+   * @param {string[]} graphemes Message body
+   * @returns {boolean} True if there are non-GSM-7 characters
+   */
+  _hasAnyUCSCharacters(graphemes: string[]): boolean {
     let result = false;
     for (const grapheme of graphemes) {
       if (grapheme.length >= 2) {
@@ -54,7 +71,14 @@ export class SegmentedMessage {
     return result;
   }
 
-  buildSegments(encodedChars: EncodedChars): Segment[] {
+  /**
+   * Internal method used to build message's segment(s)
+   *
+   * @param {object[]} encodedChars Array of EncodedChar
+   * @returns {object[]} Array of Segment
+   */
+
+  _buildSegments(encodedChars: EncodedChars): Segment[] {
     const segments: Segment[] = [];
     segments.push(new Segment());
     let currentSegment = segments[0];
@@ -77,11 +101,22 @@ export class SegmentedMessage {
     return segments;
   }
 
+  /**
+   * Return the encoding of the message segment
+   *
+   * @returns {string} Encoding for the message segment(s)
+   */
   getEncodingName(): string {
     return this.encodingName;
   }
 
-  encodeChars(graphemes: string[]): EncodedChars {
+  /**
+   * Internal method to create an array of EncodedChar from a string
+   *
+   * @param {string[]} graphemes Array of graphemes representing the message
+   * @returns {object[]} Array of EncodedChar
+   */
+  _encodeChars(graphemes: string[]): EncodedChars {
     const encodedChars: EncodedChars = [];
 
     for (const grapheme of graphemes) {
@@ -90,6 +125,9 @@ export class SegmentedMessage {
     return encodedChars;
   }
 
+  /**
+   * @returns {number} Total size of the message in bits (including User Data Header if present)
+   */
   get totalSize(): number {
     let size = 0;
     for (const segment of this.segments) {
@@ -98,6 +136,9 @@ export class SegmentedMessage {
     return size;
   }
 
+  /**
+   * @returns {number} Total size of the message in bits (excluding User Data Header if present)
+   */
   get messageSize(): number {
     let size = 0;
     for (const segment of this.segments) {
