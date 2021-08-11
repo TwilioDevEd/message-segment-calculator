@@ -54,7 +54,7 @@ class Segment extends Array {
       this.unshift(new UserDataHeader());
     }
     // Remove characters
-    while (this.freeSizeInBits() <= 0) {
+    while (this.freeSizeInBits() < 0) {
       leftOverChar.unshift(this.pop());
     }
     return leftOverChar;
