@@ -196,6 +196,16 @@ var SegmentedMessage = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(SegmentedMessage.prototype, "segmentsCount", {
+        /**
+         * @return {numner} Number of segments
+         */
+        get: function () {
+            return this.segments.length;
+        },
+        enumerable: false,
+        configurable: true
+    });
     return SegmentedMessage;
 }());
 exports.SegmentedMessage = SegmentedMessage;

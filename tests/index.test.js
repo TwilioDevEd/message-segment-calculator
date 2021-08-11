@@ -59,6 +59,7 @@ describe('Basic tests', () => {
       const segmentedMessage = new SegmentedMessage(testMessage.body);
       expect(segmentedMessage.encodingName).toBe(testMessage.encoding);
       expect(segmentedMessage.segments.length).toBe(testMessage.segments);
+      expect(segmentedMessage.segmentsCount).toBe(testMessage.segments)
       expect(segmentedMessage.messageSize).toBe(testMessage.messageSize);
       expect(segmentedMessage.totalSize).toBe(testMessage.totalSize);
     });
@@ -73,6 +74,7 @@ describe('GSM-7 Escape Characters', () => {
       );
       expect(segmentedMessage.encodingName).toBe('GSM-7');
       expect(segmentedMessage.segments.length).toBe(1);
+      expect(segmentedMessage.segmentsCount).toBe(1)
       expect(segmentedMessage.messageSize).toBe(1120);
       expect(segmentedMessage.totalSize).toBe(1120);
     });
@@ -82,6 +84,7 @@ describe('GSM-7 Escape Characters', () => {
       );
       expect(segmentedMessage.encodingName).toBe('GSM-7');
       expect(segmentedMessage.segments.length).toBe(2);
+      expect(segmentedMessage.segmentsCount).toBe(2)
       expect(segmentedMessage.messageSize).toBe(1127);
       expect(segmentedMessage.totalSize).toBe(1223);
     });
