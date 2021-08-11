@@ -1,12 +1,15 @@
 import GraphemeSplitter from 'grapheme-splitter';
 
-import UCS2EncodedChar from './libs/UCS2EncodedChar';
-import GSM7EncodedChar from './libs/GSM7EncodedChar';
+/*
+ * import UCS2EncodedChar from './libs/UCS2EncodedChar';
+ * import GSM7EncodedChar from './libs/GSM7EncodedChar';
+ */
 import Segment from './libs/Segment';
+import EncodedChar from './libs/EncodedChar';
 
 type SmsEncoding = 'GSM-7' | 'UCS-2';
 
-type EncodedChars = Array<UCS2EncodedChar> | Array<GSM7EncodedChar>;
+type EncodedChars = Array<EncodedChar>;
 
 const validEncodingValues = ['GSM-7', 'UCS-2', 'auto'];
 /*
@@ -25,8 +28,6 @@ const validEncodingValues = ['GSM-7', 'UCS-2', 'auto'];
  */
 // eslint-disable-next-line import/no-unused-modules
 export class SegmentedMessage {
-  CharClass: typeof UCS2EncodedChar | typeof GSM7EncodedChar;
-
   encoding: SmsEncoding | 'auto';
 
   segments: any;
@@ -51,10 +52,10 @@ export class SegmentedMessage {
       if (encoding === 'GSM-7') {
         throw new Error('The string provided is incompatible with GSM-7 encoding');
       }
-      this.CharClass = UCS2EncodedChar;
+      // this.CharClass = UCS2EncodedChar;
       this.encodingName = 'UCS-2';
     } else {
-      this.CharClass = GSM7EncodedChar;
+      // this.CharClass = GSM7EncodedChar;
       this.encodingName = 'GSM-7';
     }
 
@@ -73,19 +74,34 @@ export class SegmentedMessage {
     return result;
   }
 
-  buildSegments(encodedChars: EncodedChars, useTwilioReservedBits: boolean = false): Segment[] {
+  buildSegments(encodedChars: EncodedChars): Segment[] {
     const segments: Segment[] = [];
-    const hasTwilioReservedBits = useTwilioReservedBits === true;
-    let currentSegment = null;
+    segments.push(new Segment());
+    let currentSegment = segments[0];
 
     for (const encodedChar of encodedChars) {
-      if (currentSegment === null || currentSegment.freeSizeInBits() < encodedChar.sizeInBits()) {
-        if (currentSegment && hasTwilioReservedBits === false) {
-          return this.buildSegments(encodedChars, true);
-        }
+      /*
+       * if (currentSegment === null || currentSegment.freeSizeInBits() < encodedChar.sizeInBits()) {
+       *   if (currentSegment && hasTwilioReservedBits === false) {
+       *     return this.buildSegments(encodedChars, true);
+       *   }
+       */
+      /*
+       *   currentSegment = new Segment(hasTwilioReservedBits);
+       *   segments.push(currentSegment);
+       * }
+       * currentSegment.push(encodedChar);
+       */
+      if (currentSegment.freeSizeInBits() < encodedChar.sizeInBits()) {
+        segments.push(new Segment(true));
+        currentSegment = segments[segments.length - 1];
+        const previousSegment = segments[segments.length - 2];
 
-        currentSegment = new Segment(hasTwilioReservedBits);
-        segments.push(currentSegment);
+        if (!previousSegment.hasUserDataHeader) {
+          const removedChars = previousSegment.addHeader();
+          // eslint-disable-next-line no-loop-func
+          removedChars.forEach((char) => currentSegment.push(char));
+        }
       }
       currentSegment.push(encodedChar);
     }
@@ -101,14 +117,17 @@ export class SegmentedMessage {
     const encodedChars: EncodedChars = [];
 
     for (const grapheme of graphemes) {
-      if (grapheme.length <= 2) {
-        encodedChars.push(new this.CharClass(grapheme));
-      } else {
-        const parts = [...grapheme];
-        for (let i = 0; i < parts.length; i++) {
-          encodedChars.push(new this.CharClass(parts[i], i === 0 ? parts.length : 0));
-        }
-      }
+      /*
+       * if (grapheme.length <= 2) {
+       *   encodedChars.push(new EncodedChar(grapheme));
+       * } else {
+       *   const parts = [...grapheme];
+       *   for (let i = 0; i < parts.length; i++) {
+       *     encodedChars.push(new EncodedChar(parts[i], i === 0 ? parts.length : 0));
+       *   }
+       * }
+       */
+      encodedChars.push(new EncodedChar(grapheme, this.encodingName));
     }
     return encodedChars;
   }
@@ -129,6 +148,3 @@ export class SegmentedMessage {
     return size;
   }
 }
-
-// eslint-disable-next-line import/no-unused-modules
-// export default SegmentedMessage;

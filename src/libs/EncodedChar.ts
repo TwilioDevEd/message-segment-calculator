@@ -6,17 +6,36 @@ import UnicodeToGsm from './UnicodeToGSM';
  */
 
 class EncodedChar {
+  // Raw character as passed in the constructor
   raw: string;
 
-  graphemeSize: number | undefined;
+  // Array of 8 bits number rapresenting the encoded character
+  codeUnits: number[];
 
-  codeUnits: number[] | undefined;
-
+  // True if the character is a GSM7 one
   isGSM7: boolean;
 
-  constructor(char: string) {
+  // Which encoding to use for this char
+  encoding: 'GSM-7' | 'UCS-2';
+
+  constructor(char: string, encoding: 'GSM-7' | 'UCS-2') {
     this.raw = char;
+    this.encoding = encoding;
     this.isGSM7 = Boolean(char && UnicodeToGsm[char.charCodeAt(0)]);
+    if (this.isGSM7) {
+      this.codeUnits = UnicodeToGsm[char.charCodeAt(0)];
+    } else {
+      this.codeUnits = [char.charCodeAt(0), char.charCodeAt(1)];
+    }
+  }
+
+  codeUnitSizeInBits(): number {
+    return this.encoding === 'GSM-7' ? 7 : 8;
+  }
+
+  sizeInBits(): number {
+    const bitsPerUnits = this.encoding === 'GSM-7' ? 7 : 16;
+    return bitsPerUnits * this.codeUnits.length;
   }
 }
 
