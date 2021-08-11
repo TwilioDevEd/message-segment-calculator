@@ -28,7 +28,7 @@ var UCS2EncodedChar = /** @class */ (function (_super) {
     __extends(UCS2EncodedChar, _super);
     function UCS2EncodedChar(char, graphemeSize) {
         if (graphemeSize === void 0) { graphemeSize = 1; }
-        var _this = _super.call(this, char) || this;
+        var _this = _super.call(this, char, 'UCS-2') || this;
         _this.graphemeSize = graphemeSize === undefined ? 1 : graphemeSize;
         if (char.length === 2) {
             _this.codeUnits = [char.charCodeAt(0), char.charCodeAt(1)];

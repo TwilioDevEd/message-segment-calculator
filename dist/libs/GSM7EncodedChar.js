@@ -28,7 +28,7 @@ var UnicodeToGSM_1 = __importDefault(require("./UnicodeToGSM"));
 var GSM7EncodedChar = /** @class */ (function (_super) {
     __extends(GSM7EncodedChar, _super);
     function GSM7EncodedChar(char) {
-        var _this = _super.call(this, char) || this;
+        var _this = _super.call(this, char, 'GSM-7') || this;
         _this.graphemeSize = 1;
         if (char.length === 1) {
             _this.codeUnits = UnicodeToGSM_1.default[char.charCodeAt(0)];

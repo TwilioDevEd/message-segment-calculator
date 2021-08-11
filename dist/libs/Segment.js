@@ -18,36 +18,56 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var TwilioReservedChar_1 = __importDefault(require("./TwilioReservedChar"));
+var UserDataHeader_1 = __importDefault(require("./UserDataHeader"));
 /**
  * Segment Class
  * A modified array representing one segment and add some helper functions
  */
 var Segment = /** @class */ (function (_super) {
     __extends(Segment, _super);
-    function Segment(hasTwilioReservedBits) {
+    function Segment(withUserDataHeader) {
+        if (withUserDataHeader === void 0) { withUserDataHeader = false; }
         var _this = _super.call(this) || this;
-        _this.hasTwilioReservedBits = hasTwilioReservedBits;
-        if (_this.hasTwilioReservedBits) {
+        // TODO: Refactor this. Bad practice to extend basic types
+        Object.setPrototypeOf(_this, Object.create(Segment.prototype));
+        _this.hasTwilioReservedBits = withUserDataHeader;
+        _this.hasUserDataHeader = withUserDataHeader;
+        if (withUserDataHeader) {
             for (var i = 0; i < 6; i++) {
-                _this.push(new TwilioReservedChar_1.default(''));
+                _this.push(new UserDataHeader_1.default());
             }
         }
-        // TODO: Refactor this. Bad practice to extends basic types
-        Object.setPrototypeOf(_this, Object.create(Segment.prototype));
         return _this;
     }
+    // Size in bits *including* User Data Header (if present)
     Segment.prototype.sizeInBits = function () {
         return this.reduce(function (accumulator, encodedChar) { return accumulator + encodedChar.sizeInBits(); }, 0);
     };
+    // Size in bits *excluding* User Data Header (if present)
     Segment.prototype.messageSizeInBits = function () {
         return this.reduce(function (accumulator, encodedChar) {
-            return accumulator + (encodedChar instanceof TwilioReservedChar_1.default ? 0 : encodedChar.sizeInBits());
+            return accumulator + (encodedChar instanceof UserDataHeader_1.default ? 0 : encodedChar.sizeInBits());
         }, 0);
     };
     Segment.prototype.freeSizeInBits = function () {
         var maxBitsInSegment = 1120; // max size of a SMS is 140 octets -> 140 * 8bits = 1120 bits
         return maxBitsInSegment - this.sizeInBits();
+    };
+    Segment.prototype.addHeader = function () {
+        if (this.hasUserDataHeader) {
+            return [];
+        }
+        var leftOverChar = [];
+        this.hasTwilioReservedBits = true;
+        this.hasUserDataHeader = false;
+        for (var i = 0; i < 6; i++) {
+            this.unshift(new UserDataHeader_1.default());
+        }
+        // Remove characters
+        while (this.freeSizeInBits() < 0) {
+            leftOverChar.unshift(this.pop());
+        }
+        return leftOverChar;
     };
     return Segment;
 }(Array));

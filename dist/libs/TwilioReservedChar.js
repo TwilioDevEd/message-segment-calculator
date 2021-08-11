@@ -25,8 +25,10 @@ var EncodedChar_1 = __importDefault(require("./EncodedChar"));
  */
 var TwilioReservedChar = /** @class */ (function (_super) {
     __extends(TwilioReservedChar, _super);
-    function TwilioReservedChar(char) {
-        var _this = _super.call(this, char) || this;
+    function TwilioReservedChar() {
+        var _this = 
+        // content and encoding are not relevant for headers
+        _super.call(this, '', 'GSM-7') || this;
         _this.isReservedChar = true;
         return _this;
     }
