@@ -1,4 +1,25 @@
 "use strict";
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
+};
 var __values = (this && this.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
@@ -37,7 +58,10 @@ var SegmentedMessage = /** @class */ (function () {
         if (!validEncodingValues.includes(encoding)) {
             throw new Error("Encoding " + encoding + " not supported. Valid values for encoding are " + validEncodingValues.join(', '));
         }
+        this.message = message;
         this.graphemes = splitter.splitGraphemes(message);
+        this.numberOfUnicodeScalars = __spreadArray([], __read(message)).length;
+        this.numberOfCharacters = this.graphemes.length;
         this.encoding = encoding;
         if (this._hasAnyUCSCharacters(this.graphemes)) {
             if (encoding === 'GSM-7') {

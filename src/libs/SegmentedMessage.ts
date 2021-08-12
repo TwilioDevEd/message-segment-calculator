@@ -19,7 +19,13 @@ export class SegmentedMessage {
 
   graphemes: string[];
 
+  message: string;
+
   encodingName: SmsEncoding;
+
+  numberOfUnicodeScalars: number;
+
+  numberOfCharacters: number;
 
   /**
    *
@@ -38,7 +44,10 @@ export class SegmentedMessage {
       );
     }
 
+    this.message = message;
     this.graphemes = splitter.splitGraphemes(message);
+    this.numberOfUnicodeScalars = [...message].length;
+    this.numberOfCharacters = this.graphemes.length;
     this.encoding = encoding;
 
     if (this._hasAnyUCSCharacters(this.graphemes)) {
