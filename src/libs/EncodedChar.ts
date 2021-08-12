@@ -25,7 +25,10 @@ class EncodedChar {
     if (this.isGSM7) {
       this.codeUnits = UnicodeToGsm[char.charCodeAt(0)];
     } else {
-      this.codeUnits = [char.charCodeAt(0), char.charCodeAt(1)];
+      this.codeUnits = [];
+      for (let i = 0; i < char.length; i++) {
+        this.codeUnits.push(char.charCodeAt(i));
+      }
     }
   }
 

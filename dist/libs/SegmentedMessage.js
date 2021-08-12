@@ -28,7 +28,7 @@ var SegmentedMessage = /** @class */ (function () {
      * Create a new segmented message from a string
      *
      * @param {string} message Body of the message
-     * @param {boolean} [encoding] Optional: encoding. It vcan be 'GSM-7', 'UCS-2', 'auto'. Default value: 'auto'
+     * @param {boolean} [encoding] Optional: encoding. It can be 'GSM-7', 'UCS-2', 'auto'. Default value: 'auto'
      *
      */
     function SegmentedMessage(message, encoding) {

@@ -17,7 +17,10 @@ var EncodedChar = /** @class */ (function () {
             this.codeUnits = UnicodeToGSM_1.default[char.charCodeAt(0)];
         }
         else {
-            this.codeUnits = [char.charCodeAt(0), char.charCodeAt(1)];
+            this.codeUnits = [];
+            for (var i = 0; i < char.length; i++) {
+                this.codeUnits.push(char.charCodeAt(i));
+            }
         }
     }
     EncodedChar.prototype.codeUnitSizeInBits = function () {

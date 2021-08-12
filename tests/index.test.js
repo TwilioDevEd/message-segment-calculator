@@ -51,6 +51,40 @@ const TestData = [
     messageSize: 2160,
     totalSize: 2304,
   },
+  {
+    testDescription: 'UCS-2 with two bytes extended characters in one segments boundary',
+    body: '🇮🇹234567890123456789012345678901234567890123456789012345678901234567',
+    encoding: 'UCS-2',
+    segments: 1,
+    messageSize: 1120,
+    totalSize: 1120,
+  },
+  {
+    testDescription: 'UCS-2 with extended characters in two segments boundary',
+    body: '🇮🇹2345678901234567890123456789012345678901234567890123456789012345678',
+    encoding: 'UCS-2',
+    segments: 2,
+    messageSize: 1136,
+    totalSize: 1232,
+  },
+  {
+    testDescription: 'UCS-2 with four bytes extended characters in one segments boundary',
+    body: '🏳️‍🌈2345678901234567890123456789012345678901234567890123456789012345',
+    encoding: 'UCS-2',
+    segments: 1,
+    messageSize: 1120,
+    totalSize: 1120,
+  },
+  {
+    testDescription: 'UCS-2 with four bytes extended characters in two segments boundary',
+    body: '🏳️‍🌈23456789012345678901234567890123456789012345678901234567890123456',
+    encoding: 'UCS-2',
+    segments: 2,
+    messageSize: 1136,
+    totalSize: 1232,
+  },
+
+
 ];
 
 describe('Basic tests', () => {
