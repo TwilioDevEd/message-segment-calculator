@@ -51,7 +51,7 @@ class SegmentsViewer {
                 const mapKey = `${segmentIndex}-${charIndex}`;
                 this.blockMap.set(mapKey, []);
 
-                if (encodedChar instanceof TwilioReservedChar) {
+                if (encodedChar.isReservedChar) {
                     newSegments.appendChild(this.createTwilioReservedCodeUnitBlock(segmentType));
                 } else {
                     if (encodedChar.codeUnits) {
@@ -125,7 +125,7 @@ class MessageViewer {
                 const encodedChar = segment[charIndex];
                 const mapKey = `${segmentIndex}-${charIndex}`;
 
-                if (!(encodedChar instanceof TwilioReservedChar)) {
+                if (!(encodedChar.isReservedChar)) {
                     newMessage.appendChild(this.createCharBlock(encodedChar, segmentType, mapKey));
                 }
             }
