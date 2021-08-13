@@ -1,7 +1,15 @@
 {
   "name": "sms-segments-calculator",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "SMS segements calculator",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TwilioDevEd/message-segment-calculator"
+  },
+  "keywords": ["sms", "segments"],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist/**", "src/**"],
   "scripts": {
     "test": "tsc && jest",
     "build": "tsc",
@@ -11,8 +19,9 @@
     "webpack": "webpack --config webpack.config.js",
     "release": "tsc && webpack --config webpack.config.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "gverni",
+  "homepage": "https://twiliodeved.github.io/message-segment-calculator/",
+  "license": "MIT",
   "dependencies": {
     "grapheme-splitter": "^1.0.4"
   },
