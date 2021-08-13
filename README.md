@@ -22,14 +22,14 @@ console.log(segmentedMessage.segmentsCount); // "2"
 
 You can add the library to your page using the CDN file: 
 
-```
+```html
 <script src="https://cdn.jsdelivr.net/gh/TwilioDevEd/message-segment-calculator/docs/scripts/segmentsCalculator.js" integrity="sha256-wXuHVlXNhEWNzRKozzB87Qyi9/3p6LKskjDXFHIMInw=" crossorigin="anonymous"></script>
 ```
 
 Alternatively you can add the library to your page using the file [`segmentsCalculator.js`](https://github.com/TwilioDevEd/message-segment-calculator/blob/main/docs/scripts/segmentsCalculator.js) provided in `docs/scripts/` and adding it to your page: 
 
 ```html
-    <script type="text/javascript" src="scripts/segmentsCalculator.js"></script>
+<script type="text/javascript" src="scripts/segmentsCalculator.js"></script>
 ```
 
 And example of usage can be find in [`docs/index.html`](https://github.com/TwilioDevEd/message-segment-calculator/blob/main/docs/index.html)
