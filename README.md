@@ -1,4 +1,4 @@
-# Messaging Segment Calculator
+# SMS Segment Calculator
 
 This repo contains a package for an SMS segments calculator. The package is released as nodeJS package as well as browser script. 
 A browser demo for this package can be accessed [here](https://twiliodeved.github.io/message-segment-calculator/)
