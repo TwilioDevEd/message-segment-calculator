@@ -19,8 +19,6 @@ export class SegmentedMessage {
 
   graphemes: string[];
 
-  message: string;
-
   encodingName: SmsEncoding;
 
   numberOfUnicodeScalars: number;
@@ -33,6 +31,7 @@ export class SegmentedMessage {
    *
    * @param {string} message Body of the message
    * @param {boolean} [encoding] Optional: encoding. It can be 'GSM-7', 'UCS-2', 'auto'. Default value: 'auto'
+   * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
    *
    */
   constructor(message: string, encoding: SmsEncoding | 'auto' = 'auto') {
@@ -44,22 +43,41 @@ export class SegmentedMessage {
       );
     }
 
-    this.message = message;
+    /**
+     * @property {string[]} graphemes Graphemes (array of strings) the message have been split into
+     */
     this.graphemes = splitter.splitGraphemes(message);
+    /**
+     * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
+     * Some characters (e.g. extended emoji) can be made of more than one unicode pair
+     */
     this.numberOfUnicodeScalars = [...message].length;
+    /**
+     * @property {number} numberOfCharacters Number of characters in the message. Each character count as 1, regardless of the encoding.
+     */
     this.numberOfCharacters = this.graphemes.length;
+    /**
+     * @property {string} encoding Encoding set in the constructor for the message. Allowed values: 'GSM-7', 'UCS-2', 'auto'.
+     * @private
+     */
     this.encoding = encoding;
 
     if (this._hasAnyUCSCharacters(this.graphemes)) {
       if (encoding === 'GSM-7') {
         throw new Error('The string provided is incompatible with GSM-7 encoding');
       }
+      /**
+       * @property {string} encodingName Calculated encoding name. It can be: "GSM-7" or "UCS-2"
+       */
       this.encodingName = 'UCS-2';
     } else {
       this.encodingName = 'GSM-7';
     }
 
     const encodedChars: EncodedChars = this._encodeChars(this.graphemes);
+    /**
+     * @property {object[]} segments Array of segment(s) the message have been segmented into
+     */
     this.segments = this._buildSegments(encodedChars);
   }
 
@@ -68,6 +86,7 @@ export class SegmentedMessage {
    *
    * @param {string[]} graphemes Message body
    * @returns {boolean} True if there are non-GSM-7 characters
+   * @private
    */
   _hasAnyUCSCharacters(graphemes: string[]): boolean {
     let result = false;
@@ -85,6 +104,7 @@ export class SegmentedMessage {
    *
    * @param {object[]} encodedChars Array of EncodedChar
    * @returns {object[]} Array of Segment
+   * @private
    */
 
   _buildSegments(encodedChars: EncodedChars): Segment[] {
@@ -124,6 +144,7 @@ export class SegmentedMessage {
    *
    * @param {string[]} graphemes Array of graphemes representing the message
    * @returns {object[]} Array of EncodedChar
+   * @private
    */
   _encodeChars(graphemes: string[]): EncodedChars {
     const encodedChars: EncodedChars = [];
@@ -135,7 +156,7 @@ export class SegmentedMessage {
   }
 
   /**
-   * @returns {number} Total size of the message in bits (including User Data Header if present)
+   * @return {number} Total size of the message in bits (including User Data Header if present)
    */
   get totalSize(): number {
     let size = 0;
@@ -146,7 +167,7 @@ export class SegmentedMessage {
   }
 
   /**
-   * @returns {number} Total size of the message in bits (excluding User Data Header if present)
+   * @return {number} Total size of the message in bits (excluding User Data Header if present)
    */
   get messageSize(): number {
     let size = 0;
@@ -157,7 +178,8 @@ export class SegmentedMessage {
   }
 
   /**
-   * @return {numner} Number of segments
+   *
+   * @return {number} Number of segments
    */
   get segmentsCount(): number {
     return this.segments.length;

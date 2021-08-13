@@ -50,6 +50,7 @@ var SegmentedMessage = /** @class */ (function () {
      *
      * @param {string} message Body of the message
      * @param {boolean} [encoding] Optional: encoding. It can be 'GSM-7', 'UCS-2', 'auto'. Default value: 'auto'
+     * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
      *
      */
     function SegmentedMessage(message, encoding) {
@@ -58,21 +59,40 @@ var SegmentedMessage = /** @class */ (function () {
         if (!validEncodingValues.includes(encoding)) {
             throw new Error("Encoding " + encoding + " not supported. Valid values for encoding are " + validEncodingValues.join(', '));
         }
-        this.message = message;
+        /**
+         * @property {string[]} graphemes Graphemes (array of strings) the message have been split into
+         */
         this.graphemes = splitter.splitGraphemes(message);
+        /**
+         * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
+         * Some characters (e.g. extended emoji) can be made of more than one unicode pair
+         */
         this.numberOfUnicodeScalars = __spreadArray([], __read(message)).length;
+        /**
+         * @property {number} numberOfCharacters Number of characters in the message. Each character count as 1, regardless of the encoding.
+         */
         this.numberOfCharacters = this.graphemes.length;
+        /**
+         * @property {string} encoding Encoding set in the constructor for the message. Allowed values: 'GSM-7', 'UCS-2', 'auto'.
+         * @private
+         */
         this.encoding = encoding;
         if (this._hasAnyUCSCharacters(this.graphemes)) {
             if (encoding === 'GSM-7') {
                 throw new Error('The string provided is incompatible with GSM-7 encoding');
             }
+            /**
+             * @property {string} encodingName Calculated encoding name. It can be: "GSM-7" or "UCS-2"
+             */
             this.encodingName = 'UCS-2';
         }
         else {
             this.encodingName = 'GSM-7';
         }
         var encodedChars = this._encodeChars(this.graphemes);
+        /**
+         * @property {object[]} segments Array of segment(s) the message have been segmented into
+         */
         this.segments = this._buildSegments(encodedChars);
     }
     /**
@@ -80,6 +100,7 @@ var SegmentedMessage = /** @class */ (function () {
      *
      * @param {string[]} graphemes Message body
      * @returns {boolean} True if there are non-GSM-7 characters
+     * @private
      */
     SegmentedMessage.prototype._hasAnyUCSCharacters = function (graphemes) {
         var e_1, _a;
@@ -107,6 +128,7 @@ var SegmentedMessage = /** @class */ (function () {
      *
      * @param {object[]} encodedChars Array of EncodedChar
      * @returns {object[]} Array of Segment
+     * @private
      */
     SegmentedMessage.prototype._buildSegments = function (encodedChars) {
         var e_2, _a;
@@ -151,6 +173,7 @@ var SegmentedMessage = /** @class */ (function () {
      *
      * @param {string[]} graphemes Array of graphemes representing the message
      * @returns {object[]} Array of EncodedChar
+     * @private
      */
     SegmentedMessage.prototype._encodeChars = function (graphemes) {
         var e_3, _a;
@@ -172,7 +195,7 @@ var SegmentedMessage = /** @class */ (function () {
     };
     Object.defineProperty(SegmentedMessage.prototype, "totalSize", {
         /**
-         * @returns {number} Total size of the message in bits (including User Data Header if present)
+         * @return {number} Total size of the message in bits (including User Data Header if present)
          */
         get: function () {
             var e_4, _a;
@@ -197,7 +220,7 @@ var SegmentedMessage = /** @class */ (function () {
     });
     Object.defineProperty(SegmentedMessage.prototype, "messageSize", {
         /**
-         * @returns {number} Total size of the message in bits (excluding User Data Header if present)
+         * @return {number} Total size of the message in bits (excluding User Data Header if present)
          */
         get: function () {
             var e_5, _a;
@@ -222,7 +245,8 @@ var SegmentedMessage = /** @class */ (function () {
     });
     Object.defineProperty(SegmentedMessage.prototype, "segmentsCount", {
         /**
-         * @return {numner} Number of segments
+         *
+         * @return {number} Number of segments
          */
         get: function () {
             return this.segments.length;

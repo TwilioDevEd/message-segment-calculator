@@ -6,7 +6,7 @@ import UnicodeToGsm from './UnicodeToGSM';
  */
 
 class EncodedChar {
-  // Raw character as passed in the constructor
+  // Raw character (grapheme) as passed in the constructor
   raw: string;
 
   // Array of 8 bits number rapresenting the encoded character
