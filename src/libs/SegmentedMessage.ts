@@ -25,6 +25,8 @@ export class SegmentedMessage {
 
   numberOfCharacters: number;
 
+  encodedChars: EncodedChars;
+
   /**
    *
    * Create a new segmented message from a string
@@ -74,11 +76,15 @@ export class SegmentedMessage {
       this.encodingName = 'GSM-7';
     }
 
-    const encodedChars: EncodedChars = this._encodeChars(this.graphemes);
+    /**
+     * @property {string[]} encodedChars Array of encoded characters composing the message
+     */
+    this.encodedChars = this._encodeChars(this.graphemes);
+
     /**
      * @property {object[]} segments Array of segment(s) the message have been segmented into
      */
-    this.segments = this._buildSegments(encodedChars);
+    this.segments = this._buildSegments(this.encodedChars);
   }
 
   /**
@@ -156,7 +162,7 @@ export class SegmentedMessage {
   }
 
   /**
-   * @return {number} Total size of the message in bits (including User Data Header if present)
+   * @returns {number} Total size of the message in bits (including User Data Header if present)
    */
   get totalSize(): number {
     let size = 0;
@@ -167,7 +173,7 @@ export class SegmentedMessage {
   }
 
   /**
-   * @return {number} Total size of the message in bits (excluding User Data Header if present)
+   * @returns {number} Total size of the message in bits (excluding User Data Header if present)
    */
   get messageSize(): number {
     let size = 0;
@@ -179,9 +185,17 @@ export class SegmentedMessage {
 
   /**
    *
-   * @return {number} Number of segments
+   * @returns {number} Number of segments
    */
   get segmentsCount(): number {
     return this.segments.length;
+  }
+
+  /**
+   *
+   * @returns {string[]} Array of characters representing the non GSM-7 characters in the message body
+   */
+  getNonGsmCharacters(): string[] {
+    return this.encodedChars.filter((encodedChar) => !encodedChar.isGSM7).map((encodedChar) => encodedChar.raw);
   }
 }

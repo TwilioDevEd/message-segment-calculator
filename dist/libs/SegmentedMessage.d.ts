@@ -12,6 +12,7 @@ export declare class SegmentedMessage {
     encodingName: SmsEncoding;
     numberOfUnicodeScalars: number;
     numberOfCharacters: number;
+    encodedChars: EncodedChars;
     /**
      *
      * Create a new segmented message from a string
@@ -53,17 +54,22 @@ export declare class SegmentedMessage {
      */
     _encodeChars(graphemes: string[]): EncodedChars;
     /**
-     * @return {number} Total size of the message in bits (including User Data Header if present)
+     * @returns {number} Total size of the message in bits (including User Data Header if present)
      */
     get totalSize(): number;
     /**
-     * @return {number} Total size of the message in bits (excluding User Data Header if present)
+     * @returns {number} Total size of the message in bits (excluding User Data Header if present)
      */
     get messageSize(): number;
     /**
      *
-     * @return {number} Number of segments
+     * @returns {number} Number of segments
      */
     get segmentsCount(): number;
+    /**
+     *
+     * @returns {string[]} Array of characters representing the non GSM-7 characters in the message body
+     */
+    getNonGsmCharacters(): string[];
 }
 export {};
