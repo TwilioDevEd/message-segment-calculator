@@ -39,6 +39,7 @@ exports.SegmentedMessage = void 0;
 var grapheme_splitter_1 = __importDefault(require("grapheme-splitter"));
 var Segment_1 = __importDefault(require("./Segment"));
 var EncodedChar_1 = __importDefault(require("./EncodedChar"));
+var UnicodeToGSM_1 = __importDefault(require("./UnicodeToGSM"));
 var validEncodingValues = ['GSM-7', 'UCS-2', 'auto'];
 /**
  * Class representing a segmented SMS
@@ -108,7 +109,7 @@ var SegmentedMessage = /** @class */ (function () {
         try {
             for (var graphemes_1 = __values(graphemes), graphemes_1_1 = graphemes_1.next(); !graphemes_1_1.done; graphemes_1_1 = graphemes_1.next()) {
                 var grapheme = graphemes_1_1.value;
-                if (grapheme.length >= 2) {
+                if (grapheme.length >= 2 || (grapheme.length === 1 && !UnicodeToGSM_1.default[grapheme.charCodeAt(0)])) {
                     result = true;
                     break;
                 }
