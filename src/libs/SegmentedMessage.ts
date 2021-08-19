@@ -2,6 +2,7 @@ import GraphemeSplitter from 'grapheme-splitter';
 
 import Segment from './Segment';
 import EncodedChar from './EncodedChar';
+import UnicodeToGsm from './UnicodeToGSM';
 
 type SmsEncoding = 'GSM-7' | 'UCS-2';
 
@@ -91,7 +92,7 @@ export class SegmentedMessage {
   _hasAnyUCSCharacters(graphemes: string[]): boolean {
     let result = false;
     for (const grapheme of graphemes) {
-      if (grapheme.length >= 2) {
+      if (grapheme.length >= 2 || (grapheme.length === 1 && !UnicodeToGsm[grapheme.charCodeAt(0)])) {
         result = true;
         break;
       }
