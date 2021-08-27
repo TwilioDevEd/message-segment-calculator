@@ -90,11 +90,14 @@ var SegmentedMessage = /** @class */ (function () {
         else {
             this.encodingName = 'GSM-7';
         }
-        var encodedChars = this._encodeChars(this.graphemes);
+        /**
+         * @property {string[]} encodedChars Array of encoded characters
+         */
+        this.encodedChars = this._encodeChars(this.graphemes);
         /**
          * @property {object[]} segments Array of segment(s) the message have been segmented into
          */
-        this.segments = this._buildSegments(encodedChars);
+        this.segments = this._buildSegments(this.encodedChars);
     }
     /**
      * Internal method to check if the message has any non-GSM7 characters
@@ -196,7 +199,7 @@ var SegmentedMessage = /** @class */ (function () {
     };
     Object.defineProperty(SegmentedMessage.prototype, "totalSize", {
         /**
-         * @return {number} Total size of the message in bits (including User Data Header if present)
+         * @returns {number} Total size of the message in bits (including User Data Header if present)
          */
         get: function () {
             var e_4, _a;
@@ -221,7 +224,7 @@ var SegmentedMessage = /** @class */ (function () {
     });
     Object.defineProperty(SegmentedMessage.prototype, "messageSize", {
         /**
-         * @return {number} Total size of the message in bits (excluding User Data Header if present)
+         * @returns {number} Total size of the message in bits (excluding User Data Header if present)
          */
         get: function () {
             var e_5, _a;
@@ -247,7 +250,7 @@ var SegmentedMessage = /** @class */ (function () {
     Object.defineProperty(SegmentedMessage.prototype, "segmentsCount", {
         /**
          *
-         * @return {number} Number of segments
+         * @returns {number} Number of segments
          */
         get: function () {
             return this.segments.length;
@@ -255,6 +258,13 @@ var SegmentedMessage = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    /**
+     *
+     * @returns {string[]} Array of characters representing the non GSM-7 characters in the message body
+     */
+    SegmentedMessage.prototype.getNonGsmCharacters = function () {
+        return this.encodedChars.filter(function (encodedChar) { return !encodedChar.isGSM7; }).map(function (encodedChar) { return encodedChar.raw; });
+    };
     return SegmentedMessage;
 }());
 exports.SegmentedMessage = SegmentedMessage;

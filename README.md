@@ -66,6 +66,10 @@ Total size of the message in bits (excluding User Data Header if present)
 
 Number of segment(s)
 
+### [`getNonGsmCharacters()`]
+
+Return an array with the non GSM-7 characters in the body. It can be used to replace character and reduce the number of segments 
+
 ## Try the library
 
 If you want to test the library you can use the script provided in `playground/index.js`. Install the dependencies (`npm install`) and then run: 
