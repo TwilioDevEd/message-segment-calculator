@@ -91,7 +91,7 @@ var SegmentedMessage = /** @class */ (function () {
             this.encodingName = 'GSM-7';
         }
         /**
-         * @property {string[]} encodedChars Array of encoded characters
+         * @property {string[]} encodedChars Array of encoded characters composing the message
          */
         this.encodedChars = this._encodeChars(this.graphemes);
         /**
