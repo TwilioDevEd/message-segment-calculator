@@ -16,12 +16,12 @@ npm install --save sms-segments-calculator
 Sample usage: 
 
 ```javascript
-const { SegmentedMessage } = require('sms-segment-calculator');
+const { SegmentedMessage } = require('sms-segments-calculator');
 
 const segmentedMessage = new SegmentedMessage('Hello World');
 
 console.log(segmentedMessage.encodingName); // "GSM-7"
-console.log(segmentedMessage.segmentsCount); // "2"
+console.log(segmentedMessage.segmentsCount); // "1"
 ```
 
 ### Browser

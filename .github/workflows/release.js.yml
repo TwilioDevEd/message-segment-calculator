@@ -1,32 +1,42 @@
 
-name: Release
+name: Prepare release and publish package to NPM
 
 on:
   push:
     branches:
       - main
 
-jobs:
-  build:
+jobs: 
+  release:
     if: "!contains(github.event.commits[0].message, '[skip ci]')"
     runs-on: ubuntu-latest
-    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'    
 
       - name: Install npm dependencies
         run: npm install
 
-      - name: Execute automated test
-      - run: npm test  
-      
+      - name: Lint 
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run release
+        
       - name: Run automated release process with semantic-release
         if: github.event_name == 'push'
         uses: cycjimmy/semantic-release-action@v2
         with:
           extra_plugins: |
             @semantic-release/changelog
+            @semantic-release/git
+          branch: main
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,0 +1,16 @@
+{
+  "branch": "main",
+  "plugins": [
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    "@semantic-release/npm",
+    "@semantic-release/github",
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["docs/scripts/segmentsCalculator.js", "dist/**", "package.json", "CHANGELOG.md"],
+        "message": "chore(release): Release ${nextRelease.version} [skip ci]"
+      }
+    ]
+  ]
+}
