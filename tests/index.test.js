@@ -144,3 +144,47 @@ describe('GSM-7 Escape Characters', () => {
     });
   });
 });
+
+describe('One grapheme UCS-2 characters', () => {
+  const testCharacters = ['Á', 'Ú', 'ú', 'ç', 'í', 'Í', 'ó', 'Ó'];
+  testCharacters.forEach((character) => {
+    test(`One segment, 70 characters of "${character}"`, () => {
+      const testMessage = Array(70).fill(character).join('');
+      const segmentedMessage = new SegmentedMessage(testMessage);
+      expect(segmentedMessage.segmentsCount).toBe(1);
+      segmentedMessage.encodedChars.forEach((encodedChar) => {
+        expect(encodedChar.isGSM7).toBe(false);
+      });
+    });
+  });
+
+  testCharacters.forEach((character) => {
+    test(`Two segments, 71 characters of "${character}"`, () => {
+      const testMessage = Array(71).fill(character).join('');
+      const segmentedMessage = new SegmentedMessage(testMessage);
+      expect(segmentedMessage.segmentsCount).toBe(2);
+      segmentedMessage.encodedChars.forEach((encodedChar) => {
+        expect(encodedChar.isGSM7).toBe(false);
+      });
+    });
+  });
+});
+
+describe('Special tests', () => {
+  test('UCS2 message with special GSM characters in one segment', () => {
+    // Issue #18: wrong segmnent calculation using GSM special characters
+    const testMessage = '😀]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]'
+    const segmentedMessage = new SegmentedMessage(testMessage);
+    expect(segmentedMessage.segmentsCount).toBe(1);
+  })
+
+  test('UCS2 message with special GSM characters in two segment', () => {
+    const testMessage = '😀]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]'
+    const segmentedMessage = new SegmentedMessage(testMessage);
+    expect(segmentedMessage.segmentsCount).toBe(2);
+  }) 
+
+
+
+  ""
+})
