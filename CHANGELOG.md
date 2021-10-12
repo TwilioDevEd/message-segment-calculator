@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/TwilioDevEd/message-segment-calculator/compare/v1.1.0...v1.1.1) (2021-10-12)
+
+
+### Bug Fixes
+
+* GSM-7 special character size calculation in UCS-2 encoding ([636ed81](https://github.com/TwilioDevEd/message-segment-calculator/commit/636ed814ed8b9de5b28002692df3d3acae2fc1b9))
+
 # [1.1.0](https://github.com/TwilioDevEd/message-segment-calculator/compare/v1.0.2...v1.1.0) (2021-08-27)
 
 
