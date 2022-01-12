@@ -84,7 +84,6 @@
   </div>
 
   <script>
-    const graphemeSplitter = new GraphemeSplitter();
     const messageBox = document.getElementById('message');
     const encodingSelect = document.getElementById('encoding');
     const encodingUsed = document.getElementById('encoding-used');
@@ -107,7 +106,7 @@
       const messageBodyText = messageBox.value;
       const encoding = encodingSelect.value;
 
-      const segmentedMessage = new SegmentedMessage(messageBodyText, encoding, graphemeSplitter);
+      const segmentedMessage = new SegmentedMessage(messageBodyText, encoding);
 
       if (encodingUsed.textContent !== segmentedMessage.getEncodingName()) {
         messageViewerBox.setAttribute('data-encoding', segmentedMessage.getEncodingName());
@@ -118,7 +117,7 @@
       }
 
       counters.segments.textContent = segmentedMessage.segments.length;
-      counters.unicodeCharCounter.textContent = graphemeSplitter.countGraphemes(messageBodyText);
+      counters.unicodeCharCounter.textContent = segmentedMessage.numberOfCharacters;
       counters.unicodeScalarCounter.textContent = [...messageBodyText].length;
       counters.messageSize.textContent = `${segmentedMessage.messageSize} bits`;
       counters.totalSize.textContent = `${segmentedMessage.totalSize} bits`;

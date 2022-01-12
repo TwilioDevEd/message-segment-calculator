@@ -44,6 +44,7 @@ Number of Segment: ${chalk.magenta(segmentedMessage.segmentsCount)}
 Message Size: ${chalk.magenta(segmentedMessage.messageSize)}
 Total Size: ${chalk.magenta(segmentedMessage.totalSize)}
 Number of Unicode Scalars: ${chalk.magenta(segmentedMessage.numberOfUnicodeScalars)}
+Number of Characters: ${chalk.magenta(segmentedMessage.numberOfCharacters)}
 
 ${chalk.blue('Segments encoding')}`);
 
