@@ -175,13 +175,13 @@ describe('Special tests', () => {
     // Issue #18: wrong segmnent calculation using GSM special characters
     const testMessage = '😀]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]'
     const segmentedMessage = new SegmentedMessage(testMessage);
-    expect(segmentedMessage.segmentsCount).toBe(3);
+    expect(segmentedMessage.segmentsCount).toBe(1);
   })
 
   test('UCS2 message with special GSM characters in two segment', () => {
     const testMessage = '😀]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]'
     const segmentedMessage = new SegmentedMessage(testMessage);
-    expect(segmentedMessage.segmentsCount).toBe(3);
+    expect(segmentedMessage.segmentsCount).toBe(2);
   }) 
 
 

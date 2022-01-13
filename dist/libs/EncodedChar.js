@@ -27,6 +27,10 @@ var EncodedChar = /** @class */ (function () {
         return this.encoding === 'GSM-7' ? 7 : 8;
     };
     EncodedChar.prototype.sizeInBits = function () {
+        if (this.encoding === 'UCS-2' && this.isGSM7) {
+            // GSM characters are always using 16 bits in UCS-2 encoding
+            return 16;
+        }
         var bitsPerUnits = this.encoding === 'GSM-7' ? 7 : 16;
         return bitsPerUnits * this.codeUnits.length;
     };
