@@ -2,11 +2,14 @@ import Segment from './Segment';
 import EncodedChar from './EncodedChar';
 declare type SmsEncoding = 'GSM-7' | 'UCS-2';
 declare type EncodedChars = Array<EncodedChar>;
+declare type LineBreakStyle = 'LF' | 'CRLF';
 /**
  * Class representing a segmented SMS
  */
 export declare class SegmentedMessage {
     encoding: SmsEncoding | 'auto';
+    message: string;
+    lineBreakStyleName: LineBreakStyle;
     segments: Segment[];
     graphemes: string[];
     encodingName: SmsEncoding;
@@ -19,10 +22,11 @@ export declare class SegmentedMessage {
      *
      * @param {string} message Body of the message
      * @param {boolean} [encoding] Optional: encoding. It can be 'GSM-7', 'UCS-2', 'auto'. Default value: 'auto'
+     * @param {string} [lineBreakStyle] Optional: lineBreakStyle. It can be 'LF', 'CRLF', auto. Default value: 'auto'
      * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
      *
      */
-    constructor(message: string, encoding?: SmsEncoding | 'auto');
+    constructor(message: string, encoding?: SmsEncoding | 'auto', lineBreakStyle?: LineBreakStyle | 'auto');
     /**
      * Internal method to check if the message has any non-GSM7 characters
      *
@@ -31,6 +35,22 @@ export declare class SegmentedMessage {
      * @private
      */
     _hasAnyUCSCharacters(graphemes: string[]): boolean;
+    /**
+     * Internal method to check the line break styled used in the passed message
+     *
+     * @param {string} message Message body
+     * @returns {LineBreakStyle} The libre break style name LF or CRLF
+     * @private
+     */
+    _detectLineBreakStyle(message: string): LineBreakStyle;
+    /**
+     * Internal method to replace break lines
+     *
+     * @param {string} message Message body
+     * @returns {string} Message body with required line break replacements
+     * @private
+     */
+    _replaceLineBreakStyle(message: string): string;
     /**
      * Internal method used to build message's segment(s)
      *
@@ -45,6 +65,12 @@ export declare class SegmentedMessage {
      * @returns {string} Encoding for the message segment(s)
      */
     getEncodingName(): string;
+    /**
+     * Return the line break style of the message segment
+     *
+     * @returns {string} Line break style for the message segment(s)
+     */
+    getLineBreakStyleName(): string;
     /**
      * Internal method to create an array of EncodedChar from a string
      *

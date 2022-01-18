@@ -36,8 +36,20 @@
           </select>
         </div>
 
+        <span class="label">Line break style</span>
+        <div class="value">
+          <select class="not-really-value" id="linebreak">
+            <option value="auto">Automatic</option>
+            <option value="LF">LF (Unix)</option>
+            <option value="CRLF">CRLF (Windows)</option>
+          </select>
+        </div>
+
         <span class="label">Encoding Used</span>
         <span class="value" id="encoding-used"></span>
+
+        <span class="label">Line break style used</span>
+        <span class="value" id="linebreak-used"></span>
 
         <span class="label">Number of segments</span>
         <span class="value" id="segment-counter"></span>
@@ -86,7 +98,9 @@
   <script>
     const messageBox = document.getElementById('message');
     const encodingSelect = document.getElementById('encoding');
+    const linebreakStyleSelect = document.getElementById('linebreak');
     const encodingUsed = document.getElementById('encoding-used');
+    const linebreakUsed = document.getElementById('linebreak-used');
 
     const messageViewerBox = document.getElementById('message-blocks');
     const segmentsViewerBox = document.getElementById('segments-blocks');
@@ -105,8 +119,9 @@
     function updateCalculator() {
       const messageBodyText = messageBox.value;
       const encoding = encodingSelect.value;
+      const linebreakStyle = linebreakStyleSelect.value;
 
-      const segmentedMessage = new SegmentedMessage(messageBodyText, encoding);
+      const segmentedMessage = new SegmentedMessage(messageBodyText, encoding, linebreakStyle);
 
       if (encodingUsed.textContent !== segmentedMessage.getEncodingName()) {
         messageViewerBox.setAttribute('data-encoding', segmentedMessage.getEncodingName());
@@ -114,6 +129,12 @@
         encodingUsed.textContent = segmentedMessage.getEncodingName();
         encodingUsed.classList.add('recently-changed');
         setTimeout(() => {encodingUsed.classList.remove('recently-changed');}, 3000);
+      }
+
+      if (linebreakUsed.textContent !== segmentedMessage.getLineBreakStyleName()) {
+        linebreakUsed.textContent = segmentedMessage.getLineBreakStyleName();
+        linebreakUsed.classList.add('recently-changed');
+        setTimeout(() => {linebreakUsed.classList.remove('recently-changed');}, 3000);
       }
 
       counters.segments.textContent = segmentedMessage.segments.length;
@@ -145,6 +166,7 @@
 
     messageBox.oninput = (event) => { updateCalculator(); };
     encodingSelect.onchange = (event) => { updateCalculator(); };
+    linebreakStyleSelect.onchange = (event) => { updateCalculator(); };
 
     messageViewerBox.onmouseout = clearSelection;
     segmentsViewerBox.onmouseout = clearSelection;

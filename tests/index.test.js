@@ -173,18 +173,53 @@ describe('One grapheme UCS-2 characters', () => {
 describe('Special tests', () => {
   test('UCS2 message with special GSM characters in one segment', () => {
     // Issue #18: wrong segmnent calculation using GSM special characters
-    const testMessage = '😀]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]'
+    const testMessage = '😀]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]';
     const segmentedMessage = new SegmentedMessage(testMessage);
     expect(segmentedMessage.segmentsCount).toBe(1);
-  })
+  });
 
   test('UCS2 message with special GSM characters in two segment', () => {
-    const testMessage = '😀]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]'
+    const testMessage = '😀]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]';
     const segmentedMessage = new SegmentedMessage(testMessage);
     expect(segmentedMessage.segmentsCount).toBe(2);
-  }) 
+  });
+});
 
+describe('Line break styles tests', () => {
+  test('Message with Windows line break style and auto line break style detection', () => {
+    const testMessage = 'abcde\r\n123';
+    const segmentedMessage = new SegmentedMessage(testMessage);
+    expect(segmentedMessage.numberOfCharacters).toBe(10);
+  });
 
+  test('Message with Windows line break style and Unix line break style selected', () => {
+    const testMessage = 'abcde\r\n123';
+    const segmentedMessage = new SegmentedMessage(testMessage, 'auto', 'LF');
+    expect(segmentedMessage.numberOfCharacters).toBe(9);
+  });
 
-  ""
-})
+  test('Message with Unix line break style and auto line break style detection', () => {
+    const testMessage = '\nabcde\n\n123\n';
+    const segmentedMessage = new SegmentedMessage(testMessage);
+    expect(segmentedMessage.numberOfCharacters).toBe(12);
+  });
+
+  test('Message with Unix line break style and Windows line break style selected', () => {
+    const testMessage = 'abcde\n123\n';
+    const segmentedMessage = new SegmentedMessage(testMessage, 'auto', 'CRLF');
+    expect(segmentedMessage.numberOfCharacters).toBe(12);
+  });
+
+  test('Message with Windows line break style and Windows line break style selected', () => {
+    const testMessage = 'abcde\r\n123';
+    const segmentedMessage = new SegmentedMessage(testMessage, 'auto', 'CRLF');
+    expect(segmentedMessage.numberOfCharacters).toBe(10);
+  });
+
+  test('Message with multiple line break styles', () => {
+    const testMessage = '\nabcde\r\n123';
+    expect(() => {
+      new SegmentedMessage(testMessage, 'auto', 'CRLF');
+    }).toThrow('Multiple linebreak styles detected, please use a single line break style');
+  });
+});

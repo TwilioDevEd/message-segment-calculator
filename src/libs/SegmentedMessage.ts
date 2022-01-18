@@ -8,13 +8,20 @@ type SmsEncoding = 'GSM-7' | 'UCS-2';
 
 type EncodedChars = Array<EncodedChar>;
 
+type LineBreakStyle = 'LF' | 'CRLF';
+
 const validEncodingValues = ['GSM-7', 'UCS-2', 'auto'];
+const validLineBreakStyleValues = ['LF', 'CRLF', 'auto'];
 
 /**
  * Class representing a segmented SMS
  */
 export class SegmentedMessage {
   encoding: SmsEncoding | 'auto';
+
+  message: string;
+
+  lineBreakStyleName: LineBreakStyle;
 
   segments: Segment[];
 
@@ -34,10 +41,15 @@ export class SegmentedMessage {
    *
    * @param {string} message Body of the message
    * @param {boolean} [encoding] Optional: encoding. It can be 'GSM-7', 'UCS-2', 'auto'. Default value: 'auto'
+   * @param {string} [lineBreakStyle] Optional: lineBreakStyle. It can be 'LF', 'CRLF', auto. Default value: 'auto'
    * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
    *
    */
-  constructor(message: string, encoding: SmsEncoding | 'auto' = 'auto') {
+  constructor(
+    message: string,
+    encoding: SmsEncoding | 'auto' = 'auto',
+    lineBreakStyle: LineBreakStyle | 'auto' = 'auto',
+  ) {
     const splitter = new GraphemeSplitter();
 
     if (!validEncodingValues.includes(encoding)) {
@@ -46,15 +58,34 @@ export class SegmentedMessage {
       );
     }
 
+    if (!validLineBreakStyleValues.includes(lineBreakStyle)) {
+      throw new Error(
+        `Line break style ${encoding} not supported. Valid values for line break srtyle are ${validLineBreakStyleValues.join(
+          ', ',
+        )}`,
+      );
+    }
+
+    /**
+     * @property {string} lineBreakStyleName Line break style name used in the message
+     */
+    this.lineBreakStyleName = lineBreakStyle === 'auto' ? this._detectLineBreakStyle(message) : lineBreakStyle;
+    /**
+     * @property {string} message Message to calculate segments and bit size
+     */
+    this.message = this._replaceLineBreakStyle(message);
     /**
      * @property {string[]} graphemes Graphemes (array of strings) the message have been split into
      */
-    this.graphemes = splitter.splitGraphemes(message);
+    this.graphemes = splitter.splitGraphemes(this.message).reduce((accumulator: string[], grapheme: string) => {
+      const result = grapheme === '\r\n' ? grapheme.split('') : [grapheme];
+      return accumulator.concat(result);
+    }, []);
     /**
      * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
      * Some characters (e.g. extended emoji) can be made of more than one unicode pair
      */
-    this.numberOfUnicodeScalars = [...message].length;
+    this.numberOfUnicodeScalars = [...this.message].length;
     /**
      * @property {string} encoding Encoding set in the constructor for the message. Allowed values: 'GSM-7', 'UCS-2', 'auto'.
      * @private
@@ -110,6 +141,37 @@ export class SegmentedMessage {
   }
 
   /**
+   * Internal method to check the line break styled used in the passed message
+   *
+   * @param {string} message Message body
+   * @returns {LineBreakStyle} The libre break style name LF or CRLF
+   * @private
+   */
+  _detectLineBreakStyle(message: string): LineBreakStyle {
+    const lfCount = message.split(/(?<!\r)\n/gi).length;
+    const crlfCount = message.split(/\r\n/gi).length;
+    if (lfCount > 1 && crlfCount > 1) {
+      throw new Error('Multiple linebreak styles detected, please use a single line break style');
+    }
+    return crlfCount > 1 ? 'CRLF' : 'LF';
+  }
+
+  /**
+   * Internal method to replace break lines
+   *
+   * @param {string} message Message body
+   * @returns {string} Message body with required line break replacements
+   * @private
+   */
+  _replaceLineBreakStyle(message: string): string {
+    const isLineBreakEqualToName = this.lineBreakStyleName === this._detectLineBreakStyle(message);
+    if (isLineBreakEqualToName) {
+      return message;
+    }
+    return this.lineBreakStyleName === 'LF' ? message.replace(/\r\n/gi, '\n') : message.replace(/\n/gi, '\r\n');
+  }
+
+  /**
    * Internal method used to build message's segment(s)
    *
    * @param {object[]} encodedChars Array of EncodedChar
@@ -147,6 +209,15 @@ export class SegmentedMessage {
    */
   getEncodingName(): string {
     return this.encodingName;
+  }
+
+  /**
+   * Return the line break style of the message segment
+   *
+   * @returns {string} Line break style for the message segment(s)
+   */
+  getLineBreakStyleName(): string {
+    return this.lineBreakStyleName;
   }
 
   /**

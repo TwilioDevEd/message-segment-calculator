@@ -15,10 +15,14 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 var __values = (this && this.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
@@ -41,6 +45,7 @@ var Segment_1 = __importDefault(require("./Segment"));
 var EncodedChar_1 = __importDefault(require("./EncodedChar"));
 var UnicodeToGSM_1 = __importDefault(require("./UnicodeToGSM"));
 var validEncodingValues = ['GSM-7', 'UCS-2', 'auto'];
+var validLineBreakStyleValues = ['LF', 'CRLF', 'auto'];
 /**
  * Class representing a segmented SMS
  */
@@ -51,24 +56,40 @@ var SegmentedMessage = /** @class */ (function () {
      *
      * @param {string} message Body of the message
      * @param {boolean} [encoding] Optional: encoding. It can be 'GSM-7', 'UCS-2', 'auto'. Default value: 'auto'
+     * @param {string} [lineBreakStyle] Optional: lineBreakStyle. It can be 'LF', 'CRLF', auto. Default value: 'auto'
      * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
      *
      */
-    function SegmentedMessage(message, encoding) {
+    function SegmentedMessage(message, encoding, lineBreakStyle) {
         if (encoding === void 0) { encoding = 'auto'; }
+        if (lineBreakStyle === void 0) { lineBreakStyle = 'auto'; }
         var splitter = new grapheme_splitter_1.default();
         if (!validEncodingValues.includes(encoding)) {
-            throw new Error("Encoding " + encoding + " not supported. Valid values for encoding are " + validEncodingValues.join(', '));
+            throw new Error("Encoding ".concat(encoding, " not supported. Valid values for encoding are ").concat(validEncodingValues.join(', ')));
         }
+        if (!validLineBreakStyleValues.includes(lineBreakStyle)) {
+            throw new Error("Line break style ".concat(encoding, " not supported. Valid values for line break srtyle are ").concat(validLineBreakStyleValues.join(', ')));
+        }
+        /**
+         * @property {string} lineBreakStyleName Line break style name used in the message
+         */
+        this.lineBreakStyleName = lineBreakStyle === 'auto' ? this._detectLineBreakStyle(message) : lineBreakStyle;
+        /**
+         * @property {string} message Message to calculate segments and bit size
+         */
+        this.message = this._replaceLineBreakStyle(message);
         /**
          * @property {string[]} graphemes Graphemes (array of strings) the message have been split into
          */
-        this.graphemes = splitter.splitGraphemes(message);
+        this.graphemes = splitter.splitGraphemes(this.message).reduce(function (accumulator, grapheme) {
+            var result = grapheme === '\r\n' ? grapheme.split('') : [grapheme];
+            return accumulator.concat(result);
+        }, []);
         /**
          * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
          * Some characters (e.g. extended emoji) can be made of more than one unicode pair
          */
-        this.numberOfUnicodeScalars = __spreadArray([], __read(message)).length;
+        this.numberOfUnicodeScalars = __spreadArray([], __read(this.message), false).length;
         /**
          * @property {string} encoding Encoding set in the constructor for the message. Allowed values: 'GSM-7', 'UCS-2', 'auto'.
          * @private
@@ -130,6 +151,35 @@ var SegmentedMessage = /** @class */ (function () {
         return result;
     };
     /**
+     * Internal method to check the line break styled used in the passed message
+     *
+     * @param {string} message Message body
+     * @returns {LineBreakStyle} The libre break style name LF or CRLF
+     * @private
+     */
+    SegmentedMessage.prototype._detectLineBreakStyle = function (message) {
+        var lfCount = message.split(/(?<!\r)\n/gi).length;
+        var crlfCount = message.split(/\r\n/gi).length;
+        if (lfCount > 1 && crlfCount > 1) {
+            throw new Error('Multiple linebreak styles detected, please use a single line break style');
+        }
+        return crlfCount > 1 ? 'CRLF' : 'LF';
+    };
+    /**
+     * Internal method to replace break lines
+     *
+     * @param {string} message Message body
+     * @returns {string} Message body with required line break replacements
+     * @private
+     */
+    SegmentedMessage.prototype._replaceLineBreakStyle = function (message) {
+        var isLineBreakEqualToName = this.lineBreakStyleName === this._detectLineBreakStyle(message);
+        if (isLineBreakEqualToName) {
+            return message;
+        }
+        return this.lineBreakStyleName === 'LF' ? message.replace(/\r\n/gi, '\n') : message.replace(/\n/gi, '\r\n');
+    };
+    /**
      * Internal method used to build message's segment(s)
      *
      * @param {object[]} encodedChars Array of EncodedChar
@@ -173,6 +223,14 @@ var SegmentedMessage = /** @class */ (function () {
      */
     SegmentedMessage.prototype.getEncodingName = function () {
         return this.encodingName;
+    };
+    /**
+     * Return the line break style of the message segment
+     *
+     * @returns {string} Line break style for the message segment(s)
+     */
+    SegmentedMessage.prototype.getLineBreakStyleName = function () {
+        return this.lineBreakStyleName;
     };
     /**
      * Internal method to create an array of EncodedChar from a string
