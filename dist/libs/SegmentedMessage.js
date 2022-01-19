@@ -70,30 +70,32 @@ var SegmentedMessage = /** @class */ (function () {
          */
         this.numberOfUnicodeScalars = __spreadArray([], __read(message)).length;
         /**
-         * @property {number} numberOfCharacters Number of characters in the message. Each character count as 1, regardless of the encoding.
-         */
-        this.numberOfCharacters = this.graphemes.length;
-        /**
          * @property {string} encoding Encoding set in the constructor for the message. Allowed values: 'GSM-7', 'UCS-2', 'auto'.
          * @private
          */
         this.encoding = encoding;
-        if (this._hasAnyUCSCharacters(this.graphemes)) {
-            if (encoding === 'GSM-7') {
-                throw new Error('The string provided is incompatible with GSM-7 encoding');
-            }
+        if (this.encoding === 'auto') {
             /**
              * @property {string} encodingName Calculated encoding name. It can be: "GSM-7" or "UCS-2"
              */
-            this.encodingName = 'UCS-2';
+            this.encodingName = this._hasAnyUCSCharacters(this.graphemes) ? 'UCS-2' : 'GSM-7';
         }
         else {
-            this.encodingName = 'GSM-7';
+            if (encoding === 'GSM-7' && this._hasAnyUCSCharacters(this.graphemes)) {
+                throw new Error('The string provided is incompatible with GSM-7 encoding');
+            }
+            this.encodingName = this.encoding;
         }
         /**
          * @property {string[]} encodedChars Array of encoded characters composing the message
          */
         this.encodedChars = this._encodeChars(this.graphemes);
+        /**
+         * @property {number} numberOfCharacters Number of characters in the message. Each character count as 1 except for
+         * the characters in the GSM extension character set.
+         */
+        this.numberOfCharacters =
+            this.encodingName === 'UCS-2' ? this.graphemes.length : this._countCodeUnits(this.encodedChars);
         /**
          * @property {object[]} segments Array of segment(s) the message have been segmented into
          */
@@ -196,6 +198,16 @@ var SegmentedMessage = /** @class */ (function () {
             finally { if (e_3) throw e_3.error; }
         }
         return encodedChars;
+    };
+    /**
+     * Internal method to count the total number of code units of the message
+     *
+     * @param {EncodedChar[]} encodedChars Encoded message body
+     * @returns {number} The total number of code units
+     * @private
+     */
+    SegmentedMessage.prototype._countCodeUnits = function (encodedChars) {
+        return encodedChars.reduce(function (acumulator, nextEncodedChar) { return acumulator + nextEncodedChar.codeUnits.length; }, 0);
     };
     Object.defineProperty(SegmentedMessage.prototype, "totalSize", {
         /**

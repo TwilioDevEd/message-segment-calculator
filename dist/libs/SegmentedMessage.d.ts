@@ -54,6 +54,14 @@ export declare class SegmentedMessage {
      */
     _encodeChars(graphemes: string[]): EncodedChars;
     /**
+     * Internal method to count the total number of code units of the message
+     *
+     * @param {EncodedChar[]} encodedChars Encoded message body
+     * @returns {number} The total number of code units
+     * @private
+     */
+    _countCodeUnits(encodedChars: EncodedChar[]): number;
+    /**
      * @returns {number} Total size of the message in bits (including User Data Header if present)
      */
     get totalSize(): number;
