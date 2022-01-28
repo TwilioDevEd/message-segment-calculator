@@ -2,7 +2,7 @@ import Segment from './Segment';
 import EncodedChar from './EncodedChar';
 declare type SmsEncoding = 'GSM-7' | 'UCS-2';
 declare type EncodedChars = Array<EncodedChar>;
-declare type LineBreakStyle = 'LF' | 'CRLF';
+declare type LineBreakStyle = 'LF' | 'CRLF' | 'LF+CRLF';
 /**
  * Class representing a segmented SMS
  */

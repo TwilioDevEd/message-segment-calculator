@@ -8,10 +8,10 @@ type SmsEncoding = 'GSM-7' | 'UCS-2';
 
 type EncodedChars = Array<EncodedChar>;
 
-type LineBreakStyle = 'LF' | 'CRLF';
+type LineBreakStyle = 'LF' | 'CRLF' | 'LF+CRLF';
 
 const validEncodingValues = ['GSM-7', 'UCS-2', 'auto'];
-const validLineBreakStyleValues = ['LF', 'CRLF', 'auto'];
+const validLineBreakStyleValues = ['LF', 'CRLF', 'LF+CRLF', 'auto'];
 
 /**
  * Class representing a segmented SMS
@@ -150,8 +150,9 @@ export class SegmentedMessage {
   _detectLineBreakStyle(message: string): LineBreakStyle {
     const lfCount = message.split(/(?<!\r)\n/gi).length;
     const crlfCount = message.split(/\r\n/gi).length;
+
     if (lfCount > 1 && crlfCount > 1) {
-      throw new Error('Multiple linebreak styles detected, please use a single line break style');
+      return 'LF+CRLF';
     }
     return crlfCount > 1 ? 'CRLF' : 'LF';
   }
@@ -165,10 +166,10 @@ export class SegmentedMessage {
    */
   _replaceLineBreakStyle(message: string): string {
     const isLineBreakEqualToName = this.lineBreakStyleName === this._detectLineBreakStyle(message);
-    if (isLineBreakEqualToName) {
+    if (isLineBreakEqualToName || this.lineBreakStyleName === 'LF+CRLF') {
       return message;
     }
-    return this.lineBreakStyleName === 'LF' ? message.replace(/\r\n/gi, '\n') : message.replace(/\n/gi, '\r\n');
+    return this.lineBreakStyleName === 'LF' ? message.replace(/\r\n/gi, '\n') : message.replace(/(?<!\r)\n/gi, '\r\n');
   }
 
   /**

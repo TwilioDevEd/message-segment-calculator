@@ -186,40 +186,51 @@ describe('Special tests', () => {
 });
 
 describe('Line break styles tests', () => {
-  test('Message with Windows line break style and auto line break style detection', () => {
+  test('Message with CRLF line break style and auto line break style detection', () => {
     const testMessage = 'abcde\r\n123';
     const segmentedMessage = new SegmentedMessage(testMessage);
     expect(segmentedMessage.numberOfCharacters).toBe(10);
   });
 
-  test('Message with Windows line break style and Unix line break style selected', () => {
+  test('Message with CRLF line break style and LF line break style selected', () => {
     const testMessage = 'abcde\r\n123';
     const segmentedMessage = new SegmentedMessage(testMessage, 'auto', 'LF');
     expect(segmentedMessage.numberOfCharacters).toBe(9);
   });
 
-  test('Message with Unix line break style and auto line break style detection', () => {
+  test('Message with LF line break style and auto line break style detection', () => {
     const testMessage = '\nabcde\n\n123\n';
     const segmentedMessage = new SegmentedMessage(testMessage);
     expect(segmentedMessage.numberOfCharacters).toBe(12);
   });
 
-  test('Message with Unix line break style and Windows line break style selected', () => {
+  test('Message with LF line break style and CRLF line break style selected', () => {
     const testMessage = 'abcde\n123\n';
     const segmentedMessage = new SegmentedMessage(testMessage, 'auto', 'CRLF');
     expect(segmentedMessage.numberOfCharacters).toBe(12);
   });
 
-  test('Message with Windows line break style and Windows line break style selected', () => {
+  test('Message with CRLF line break style and CRLF line break style selected', () => {
     const testMessage = 'abcde\r\n123';
     const segmentedMessage = new SegmentedMessage(testMessage, 'auto', 'CRLF');
     expect(segmentedMessage.numberOfCharacters).toBe(10);
   });
 
-  test('Message with multiple line break styles', () => {
+  test('Message with multiple line break styles and auto line break style selected', () => {
     const testMessage = '\nabcde\r\n123';
-    expect(() => {
-      new SegmentedMessage(testMessage, 'auto', 'CRLF');
-    }).toThrow('Multiple linebreak styles detected, please use a single line break style');
+    const segmentedMessage = new SegmentedMessage(testMessage, 'auto', 'auto');
+    expect(segmentedMessage.numberOfCharacters).toBe(11);
+  });
+
+  test('Message with multiple line break styles and LF line break style selected', () => {
+    const testMessage = '\nabcde\r\n123';
+    const segmentedMessage = new SegmentedMessage(testMessage, 'auto', 'LF');
+    expect(segmentedMessage.numberOfCharacters).toBe(10);
+  });
+
+  test('Message with multiple line break styles and CRLF line break style selected', () => {
+    const testMessage = '\nabcde\r\n123';
+    const segmentedMessage = new SegmentedMessage(testMessage, 'auto', 'CRLF');
+    expect(segmentedMessage.numberOfCharacters).toBe(12);
   });
 });
