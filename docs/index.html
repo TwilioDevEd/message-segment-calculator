@@ -78,6 +78,13 @@
             <div id="segments-viewer"></div>
           </span>
         </span>
+
+        <span class="label">Warnings</span>
+        <span class="value">
+          <span id="warnings-blocks">
+            <div id="warnings-viewer"></div>
+          </span>
+        </span>
       </div>
     </div>
 
@@ -100,6 +107,7 @@
 
     const messageViewer = new MessageViewer(document.getElementById('message-viewer'), 5);
     const segmentsViewer = new SegmentsViewer(document.getElementById('segments-viewer'), 5);
+    const warningsViewer = new WarningsViewer(document.getElementById('warnings-viewer'));
 
     const counters = {
       segments: document.getElementById('segment-counter'),
@@ -132,6 +140,7 @@
 
       messageViewer.update(segmentedMessage);
       segmentsViewer.update(segmentedMessage);
+      warningsViewer.update(segmentedMessage.warnings);
     }
 
     function selectBlocks(event) {
