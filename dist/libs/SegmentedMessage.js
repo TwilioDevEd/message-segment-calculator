@@ -40,6 +40,7 @@ var grapheme_splitter_1 = __importDefault(require("grapheme-splitter"));
 var Segment_1 = __importDefault(require("./Segment"));
 var EncodedChar_1 = __importDefault(require("./EncodedChar"));
 var UnicodeToGSM_1 = __importDefault(require("./UnicodeToGSM"));
+var SmartEncodingMap_1 = __importDefault(require("./SmartEncodingMap"));
 var validEncodingValues = ['GSM-7', 'UCS-2', 'auto'];
 /**
  * Class representing a segmented SMS
@@ -51,14 +52,20 @@ var SegmentedMessage = /** @class */ (function () {
      *
      * @param {string} message Body of the message
      * @param {boolean} [encoding] Optional: encoding. It can be 'GSM-7', 'UCS-2', 'auto'. Default value: 'auto'
+     * @param {boolean} smartEncoding Optional: whether or not Twilio's [Smart Encoding](https://www.twilio.com/docs/messaging/services#smart-encoding) is emulated. Default value: false
      * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
      *
      */
-    function SegmentedMessage(message, encoding) {
+    function SegmentedMessage(message, encoding, smartEncoding) {
         if (encoding === void 0) { encoding = 'auto'; }
+        if (smartEncoding === void 0) { smartEncoding = false; }
         var splitter = new grapheme_splitter_1.default();
         if (!validEncodingValues.includes(encoding)) {
             throw new Error("Encoding " + encoding + " not supported. Valid values for encoding are " + validEncodingValues.join(', '));
+        }
+        if (smartEncoding) {
+            message = __spreadArray([], __read(message)).map(function (char) { return (SmartEncodingMap_1.default[char] === undefined ? char : SmartEncodingMap_1.default[char]); })
+                .join('');
         }
         /**
          * @property {string[]} graphemes Graphemes (array of strings) the message have been split into

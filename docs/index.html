@@ -26,7 +26,13 @@
       </div>
 
       <div id="information-box">
-
+        <span class="label">Use Smart Encoding?</span>
+        <div class="value">
+          <select class="not-really-value" id="smart-encoding">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+        </div>
         <span class="label">Encoding</span>
         <div class="value">
           <select class="not-really-value" id="encoding">
@@ -86,6 +92,7 @@
   <script>
     const messageBox = document.getElementById('message');
     const encodingSelect = document.getElementById('encoding');
+    const smartEncodingSelect = document.getElementById('smart-encoding');
     const encodingUsed = document.getElementById('encoding-used');
 
     const messageViewerBox = document.getElementById('message-blocks');
@@ -105,8 +112,9 @@
     function updateCalculator() {
       const messageBodyText = messageBox.value;
       const encoding = encodingSelect.value;
+      const smartEncoding = smartEncodingSelect.value === 'yes';
 
-      const segmentedMessage = new SegmentedMessage(messageBodyText, encoding);
+      const segmentedMessage = new SegmentedMessage(messageBodyText, encoding, smartEncoding);
 
       if (encodingUsed.textContent !== segmentedMessage.getEncodingName()) {
         messageViewerBox.setAttribute('data-encoding', segmentedMessage.getEncodingName());
@@ -145,6 +153,7 @@
 
     messageBox.oninput = (event) => { updateCalculator(); };
     encodingSelect.onchange = (event) => { updateCalculator(); };
+    smartEncodingSelect.onchange = (event) => { updateCalculator(); };
 
     messageViewerBox.onmouseout = clearSelection;
     segmentsViewerBox.onmouseout = clearSelection;
