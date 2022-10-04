@@ -1,3 +1,11 @@
+# [1.2.0](https://github.com/TwilioDevEd/message-segment-calculator/compare/v1.1.1...v1.2.0) (2022-10-04)
+
+
+### Features
+
+* **SmartEncoding:** Add support for Twilio's current SmartEncoding ([79fbec5](https://github.com/TwilioDevEd/message-segment-calculator/commit/79fbec565e237008221ca5aca24fce47bf5d4e70))
+* **SmartEncoding:** Hyperlink "Smart Encoding" and prevent unreadable contrast issue ([d3410eb](https://github.com/TwilioDevEd/message-segment-calculator/commit/d3410ebb60178b1dc69affd2c337079756c3709e))
+
 ## [1.1.1](https://github.com/TwilioDevEd/message-segment-calculator/compare/v1.1.0...v1.1.1) (2021-10-12)
 
 
