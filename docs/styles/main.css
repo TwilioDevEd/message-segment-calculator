@@ -14,6 +14,11 @@ h1 {
     padding: 10px;
 }
 
+#calculator-header a {
+    /* default blue/purples would be unreadable against blue background */
+    color: inherit;
+}
+
 #message-box {
     color: white;
     margin-bottom: 10px;

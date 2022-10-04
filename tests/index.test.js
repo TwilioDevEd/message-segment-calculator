@@ -1,4 +1,5 @@
 const { SegmentedMessage } = require('../dist');
+const SmartEncodingMap = require('../dist/libs/SmartEncodingMap').default;
 
 const GSM7EscapeChars = ['|', '^', '€', '{', '}', '[', ']', '~', '\\'];
 
@@ -105,6 +106,23 @@ const TestData = [
   },
 ];
 
+describe('Smart Encoding', () => {
+  test.each(Object.entries(SmartEncodingMap))('With Smart Encoding enabled - maps %s to %s', (key, value) => {
+    const segmentedMessage = new SegmentedMessage(key, 'auto', true);
+    expect(segmentedMessage.graphemes.join('')).toBe(value);
+  });
+  test.each(Object.entries(SmartEncodingMap))('With Smart Encoding disabled - does not modify %s', (key) => {
+    const segmentedMessage = new SegmentedMessage(key, 'auto', false);
+    expect(segmentedMessage.graphemes.join('')).toBe(key);
+  });
+  test('Replace all Smart Encoding chars at once', () => {
+    const testString = Object.keys(SmartEncodingMap).join('');
+    const expected = Object.values(SmartEncodingMap).join('');
+    const segmentedMessage = new SegmentedMessage(testString, 'auto', true);
+    expect(segmentedMessage.graphemes.join('')).toBe(expected);
+  });
+});
+
 describe('Basic tests', () => {
   TestData.forEach((testMessage) => {
     test(testMessage.testDescription, () => {
@@ -173,18 +191,14 @@ describe('One grapheme UCS-2 characters', () => {
 describe('Special tests', () => {
   test('UCS2 message with special GSM characters in one segment', () => {
     // Issue #18: wrong segmnent calculation using GSM special characters
-    const testMessage = '😀]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]'
+    const testMessage = '😀]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]';
     const segmentedMessage = new SegmentedMessage(testMessage);
     expect(segmentedMessage.segmentsCount).toBe(1);
-  })
+  });
 
   test('UCS2 message with special GSM characters in two segment', () => {
-    const testMessage = '😀]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]'
+    const testMessage = '😀]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]';
     const segmentedMessage = new SegmentedMessage(testMessage);
     expect(segmentedMessage.segmentsCount).toBe(2);
-  }) 
-
-
-
-  ""
-})
+  });
+});

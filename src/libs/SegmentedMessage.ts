@@ -3,6 +3,7 @@ import GraphemeSplitter from 'grapheme-splitter';
 import Segment from './Segment';
 import EncodedChar from './EncodedChar';
 import UnicodeToGsm from './UnicodeToGSM';
+import SmartEncodingMap from './SmartEncodingMap';
 
 type SmsEncoding = 'GSM-7' | 'UCS-2';
 
@@ -34,16 +35,23 @@ export class SegmentedMessage {
    *
    * @param {string} message Body of the message
    * @param {boolean} [encoding] Optional: encoding. It can be 'GSM-7', 'UCS-2', 'auto'. Default value: 'auto'
+   * @param {boolean} smartEncoding Optional: whether or not Twilio's [Smart Encoding](https://www.twilio.com/docs/messaging/services#smart-encoding) is emulated. Default value: false
    * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
    *
    */
-  constructor(message: string, encoding: SmsEncoding | 'auto' = 'auto') {
+  constructor(message: string, encoding: SmsEncoding | 'auto' = 'auto', smartEncoding: boolean = false) {
     const splitter = new GraphemeSplitter();
 
     if (!validEncodingValues.includes(encoding)) {
       throw new Error(
         `Encoding ${encoding} not supported. Valid values for encoding are ${validEncodingValues.join(', ')}`,
       );
+    }
+
+    if (smartEncoding) {
+      message = [...message]
+        .map<string>((char) => (SmartEncodingMap[char] === undefined ? char : SmartEncodingMap[char]))
+        .join('');
     }
 
     /**
