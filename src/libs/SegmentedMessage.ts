@@ -276,7 +276,7 @@ export class SegmentedMessage {
     const warnings = [];
     if (this.lineBreakStyle) {
       warnings.push(
-        'The message has line breaks, the web page utility only suports LF style, if you insert a CRLF it will be converted to LF',
+        'The message has line breaks, the web page utility only supports LF style. If you insert a CRLF it will be converted to LF.',
       );
     }
     return warnings;
