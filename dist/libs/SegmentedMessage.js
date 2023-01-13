@@ -15,10 +15,14 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 var __values = (this && this.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
@@ -61,10 +65,10 @@ var SegmentedMessage = /** @class */ (function () {
         if (smartEncoding === void 0) { smartEncoding = false; }
         var splitter = new grapheme_splitter_1.default();
         if (!validEncodingValues.includes(encoding)) {
-            throw new Error("Encoding " + encoding + " not supported. Valid values for encoding are " + validEncodingValues.join(', '));
+            throw new Error("Encoding ".concat(encoding, " not supported. Valid values for encoding are ").concat(validEncodingValues.join(', ')));
         }
         if (smartEncoding) {
-            message = __spreadArray([], __read(message)).map(function (char) { return (SmartEncodingMap_1.default[char] === undefined ? char : SmartEncodingMap_1.default[char]); })
+            message = __spreadArray([], __read(message), false).map(function (char) { return (SmartEncodingMap_1.default[char] === undefined ? char : SmartEncodingMap_1.default[char]); })
                 .join('');
         }
         /**
@@ -78,7 +82,7 @@ var SegmentedMessage = /** @class */ (function () {
          * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
          * Some characters (e.g. extended emoji) can be made of more than one unicode pair
          */
-        this.numberOfUnicodeScalars = __spreadArray([], __read(message)).length;
+        this.numberOfUnicodeScalars = __spreadArray([], __read(message), false).length;
         /**
          * @property {string} encoding Encoding set in the constructor for the message. Allowed values: 'GSM-7', 'UCS-2', 'auto'.
          * @private
@@ -324,7 +328,7 @@ var SegmentedMessage = /** @class */ (function () {
     SegmentedMessage.prototype._checkForWarnings = function () {
         var warnings = [];
         if (this.lineBreakStyle) {
-            warnings.push('The message has line breaks, the web page utility only supports LF style. If you insert a <a href="https://developer.mozilla.org/en-US/docs/Glossary/CRLF">CRLF</a> it will be converted to LF.');
+            warnings.push('The message has line breaks, the web page utility only supports LF style. If you insert a CRLF it will be converted to LF.');
         }
         return warnings;
     };
