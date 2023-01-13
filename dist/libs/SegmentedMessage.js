@@ -70,7 +70,10 @@ var SegmentedMessage = /** @class */ (function () {
         /**
          * @property {string[]} graphemes Graphemes (array of strings) the message have been split into
          */
-        this.graphemes = splitter.splitGraphemes(message);
+        this.graphemes = splitter.splitGraphemes(message).reduce(function (accumulator, grapheme) {
+            var result = grapheme === '\r\n' ? grapheme.split('') : [grapheme];
+            return accumulator.concat(result);
+        }, []);
         /**
          * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
          * Some characters (e.g. extended emoji) can be made of more than one unicode pair
@@ -107,6 +110,14 @@ var SegmentedMessage = /** @class */ (function () {
          * @property {object[]} segments Array of segment(s) the message have been segmented into
          */
         this.segments = this._buildSegments(this.encodedChars);
+        /**
+         * @property {LineBreakStyle} lineBreakStyle message line break style
+         */
+        this.lineBreakStyle = this._detectLineBreakStyle(message);
+        /**
+         * @property {string[]} warnings message line break style
+         */
+        this.warnings = this._checkForWarnings();
     }
     /**
      * Internal method to check if the message has any non-GSM7 characters
@@ -283,6 +294,39 @@ var SegmentedMessage = /** @class */ (function () {
      */
     SegmentedMessage.prototype.getNonGsmCharacters = function () {
         return this.encodedChars.filter(function (encodedChar) { return !encodedChar.isGSM7; }).map(function (encodedChar) { return encodedChar.raw; });
+    };
+    /**
+     * Internal method to check the line break styled used in the passed message
+     *
+     * @param {string} message Message body
+     * @returns {LineBreakStyle} The libre break style name LF or CRLF
+     * @private
+     */
+    SegmentedMessage.prototype._detectLineBreakStyle = function (message) {
+        var hasWindowsStyle = message.includes('\r\n');
+        var HasUnixStyle = message.includes('\n');
+        var mixedStyle = hasWindowsStyle && HasUnixStyle;
+        var noBreakLine = !hasWindowsStyle && !HasUnixStyle;
+        if (noBreakLine) {
+            return undefined;
+        }
+        if (mixedStyle) {
+            return 'LF+CRLF';
+        }
+        return HasUnixStyle ? 'LF' : 'CRLF';
+    };
+    /**
+     * Internal method to check the line break styled used in the passed message
+     *
+     * @returns {string[]} The libre break style name LF or CRLF
+     * @private
+     */
+    SegmentedMessage.prototype._checkForWarnings = function () {
+        var warnings = [];
+        if (this.lineBreakStyle) {
+            warnings.push('The message has line breaks, the web page utility only suports LF style, if you insert a CRLF it will be converted to LF');
+        }
+        return warnings;
     };
     return SegmentedMessage;
 }());

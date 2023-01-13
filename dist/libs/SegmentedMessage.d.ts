@@ -2,6 +2,7 @@ import Segment from './Segment';
 import EncodedChar from './EncodedChar';
 declare type SmsEncoding = 'GSM-7' | 'UCS-2';
 declare type EncodedChars = Array<EncodedChar>;
+declare type LineBreakStyle = 'LF' | 'CRLF' | 'LF+CRLF' | undefined;
 /**
  * Class representing a segmented SMS
  */
@@ -13,6 +14,8 @@ export declare class SegmentedMessage {
     numberOfUnicodeScalars: number;
     numberOfCharacters: number;
     encodedChars: EncodedChars;
+    lineBreakStyle: LineBreakStyle;
+    warnings: string[];
     /**
      *
      * Create a new segmented message from a string
@@ -80,5 +83,20 @@ export declare class SegmentedMessage {
      * @returns {string[]} Array of characters representing the non GSM-7 characters in the message body
      */
     getNonGsmCharacters(): string[];
+    /**
+     * Internal method to check the line break styled used in the passed message
+     *
+     * @param {string} message Message body
+     * @returns {LineBreakStyle} The libre break style name LF or CRLF
+     * @private
+     */
+    _detectLineBreakStyle(message: string): LineBreakStyle;
+    /**
+     * Internal method to check the line break styled used in the passed message
+     *
+     * @returns {string[]} The libre break style name LF or CRLF
+     * @private
+     */
+    _checkForWarnings(): string[];
 }
 export {};

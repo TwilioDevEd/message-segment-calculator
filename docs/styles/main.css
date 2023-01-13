@@ -234,3 +234,6 @@ h1 {
     font-family: monospace;
   }
   
+#warnings-viewer {
+    font-size: 10px;
+}

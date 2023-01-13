@@ -159,3 +159,22 @@ class MessageViewer {
         this.selectedBlock = null;        
     }
 }
+
+class WarningsViewer {
+    constructor(node) {
+        this.node = node;
+    }
+
+    createWarningBlock(warning){
+        const warningParagraph = document.createElement("p");
+        warningParagraph.innerText = warning;
+        return warningParagraph;
+    }
+
+    update(warnings){
+        this.node.innerHTML = '';
+        warnings.forEach(warning => {
+            this.node.appendChild(this.createWarningBlock(warning))
+        });
+    }
+}

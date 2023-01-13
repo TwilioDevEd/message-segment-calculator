@@ -202,3 +202,17 @@ describe('Special tests', () => {
     expect(segmentedMessage.segmentsCount).toBe(2);
   });
 });
+
+describe('Line break styles tests', () => {
+  test('Message with CRLF line break style and auto line break style detection', () => {
+    const testMessage = '\rabcde\r\n123';
+    const segmentedMessage = new SegmentedMessage(testMessage);
+    expect(segmentedMessage.numberOfCharacters).toBe(11);
+  });
+
+  test('Message with LF line break style and auto line break style detection', () => {
+    const testMessage = '\nabcde\n\n123\n';
+    const segmentedMessage = new SegmentedMessage(testMessage);
+    expect(segmentedMessage.numberOfCharacters).toBe(12);
+  });
+});

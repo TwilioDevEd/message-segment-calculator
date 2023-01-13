@@ -11,6 +11,8 @@ type EncodedChars = Array<EncodedChar>;
 
 const validEncodingValues = ['GSM-7', 'UCS-2', 'auto'];
 
+declare type LineBreakStyle = 'LF' | 'CRLF' | 'LF+CRLF' | undefined;
+
 /**
  * Class representing a segmented SMS
  */
@@ -28,6 +30,10 @@ export class SegmentedMessage {
   numberOfCharacters: number;
 
   encodedChars: EncodedChars;
+
+  lineBreakStyle: LineBreakStyle;
+
+  warnings: string[];
 
   /**
    *
@@ -57,7 +63,10 @@ export class SegmentedMessage {
     /**
      * @property {string[]} graphemes Graphemes (array of strings) the message have been split into
      */
-    this.graphemes = splitter.splitGraphemes(message);
+    this.graphemes = splitter.splitGraphemes(message).reduce((accumulator: string[], grapheme: string) => {
+      const result = grapheme === '\r\n' ? grapheme.split('') : [grapheme];
+      return accumulator.concat(result);
+    }, []);
     /**
      * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
      * Some characters (e.g. extended emoji) can be made of more than one unicode pair
@@ -97,6 +106,16 @@ export class SegmentedMessage {
      * @property {object[]} segments Array of segment(s) the message have been segmented into
      */
     this.segments = this._buildSegments(this.encodedChars);
+
+    /**
+     * @property {LineBreakStyle} lineBreakStyle message line break style
+     */
+    this.lineBreakStyle = this._detectLineBreakStyle(message);
+
+    /**
+     * @property {string[]} warnings message line break style
+     */
+    this.warnings = this._checkForWarnings();
   }
 
   /**
@@ -223,5 +242,43 @@ export class SegmentedMessage {
    */
   getNonGsmCharacters(): string[] {
     return this.encodedChars.filter((encodedChar) => !encodedChar.isGSM7).map((encodedChar) => encodedChar.raw);
+  }
+
+  /**
+   * Internal method to check the line break styled used in the passed message
+   *
+   * @param {string} message Message body
+   * @returns {LineBreakStyle} The libre break style name LF or CRLF
+   * @private
+   */
+  _detectLineBreakStyle(message: string): LineBreakStyle {
+    const hasWindowsStyle = message.includes('\r\n');
+    const HasUnixStyle = message.includes('\n');
+    const mixedStyle = hasWindowsStyle && HasUnixStyle;
+    const noBreakLine = !hasWindowsStyle && !HasUnixStyle;
+
+    if (noBreakLine) {
+      return undefined;
+    }
+    if (mixedStyle) {
+      return 'LF+CRLF';
+    }
+    return HasUnixStyle ? 'LF' : 'CRLF';
+  }
+
+  /**
+   * Internal method to check the line break styled used in the passed message
+   *
+   * @returns {string[]} The libre break style name LF or CRLF
+   * @private
+   */
+  _checkForWarnings(): string[] {
+    const warnings = [];
+    if (this.lineBreakStyle) {
+      warnings.push(
+        'The message has line breaks, the web page utility only suports LF style, if you insert a CRLF it will be converted to LF',
+      );
+    }
+    return warnings;
   }
 }
