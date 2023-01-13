@@ -12,7 +12,7 @@ var EncodedChar = /** @class */ (function () {
     function EncodedChar(char, encoding) {
         this.raw = char;
         this.encoding = encoding;
-        this.isGSM7 = Boolean(char && UnicodeToGSM_1.default[char.charCodeAt(0)]);
+        this.isGSM7 = Boolean(char && char.length === 1 && UnicodeToGSM_1.default[char.charCodeAt(0)]);
         if (this.isGSM7) {
             this.codeUnits = UnicodeToGSM_1.default[char.charCodeAt(0)];
         }

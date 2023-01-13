@@ -21,7 +21,7 @@ class EncodedChar {
   constructor(char: string, encoding: 'GSM-7' | 'UCS-2') {
     this.raw = char;
     this.encoding = encoding;
-    this.isGSM7 = Boolean(char && UnicodeToGsm[char.charCodeAt(0)]);
+    this.isGSM7 = Boolean(char && char.length === 1 && UnicodeToGsm[char.charCodeAt(0)]);
     if (this.isGSM7) {
       this.codeUnits = UnicodeToGsm[char.charCodeAt(0)];
     } else {

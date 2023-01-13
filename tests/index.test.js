@@ -1,3 +1,4 @@
+const expectExport = require('expect');
 const { SegmentedMessage } = require('../dist');
 const SmartEncodingMap = require('../dist/libs/SmartEncodingMap').default;
 
@@ -214,5 +215,25 @@ describe('Line break styles tests', () => {
     const testMessage = '\nabcde\n\n123\n';
     const segmentedMessage = new SegmentedMessage(testMessage);
     expect(segmentedMessage.numberOfCharacters).toBe(12);
+  });
+
+  test('Triple accents characters - Unicode test', () => {
+    const testMessage = 'é́́';
+    const segmentedMessage = new SegmentedMessage(testMessage);
+    expect(segmentedMessage.numberOfCharacters).toBe(1);
+    expect(segmentedMessage.numberOfUnicodeScalars).toBe(4);
+  });
+
+  // Test for https://github.com/TwilioDevEd/message-segment-calculator/issues/17
+  test('Triple accents characters - One Segment test', () => {
+    const testMessage = 'é́́aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+    const segmentedMessage = new SegmentedMessage(testMessage);
+    expect(segmentedMessage.segmentsCount).toBe(1);
+  });
+
+  test('Triple accents characters - Two Segments test', () => {
+    const testMessage = 'é́́aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+    const segmentedMessage = new SegmentedMessage(testMessage);
+    expect(segmentedMessage.segmentsCount).toBe(2);
   });
 });
