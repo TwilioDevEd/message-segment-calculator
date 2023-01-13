@@ -1,6 +1,7 @@
 {
-    "extends": [
-      "twilio-ts"
-    ],
-    "ignorePatterns": ["docs/*", "*.js"]
+  "extends": ["twilio-ts"],
+  "ignorePatterns": ["docs/*", "*.js"],
+  "rules": {
+    "@typescript-eslint/member-ordering": "off"
   }
+}
