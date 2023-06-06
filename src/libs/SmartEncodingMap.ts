@@ -8,6 +8,7 @@ const SmartEncodingMap: {
   '\u02ba': '"', // MODIFIER LETTER DOUBLE PRIME
   '\u02ee': '"', // MODIFIER LETTER DOUBLE APOSTROPHE
   '\u201f': '"', // DOUBLE HIGH-REVERSED-9 QUOTATION MARK
+  '\u201E': '"', // DOUBLE LOW-9 QUOTATION MARK
   '\u275d': '"', // HEAVY DOUBLE TURNED COMMA QUOTATION MARK ORNAMENT
   '\u275e': '"', // HEAVY DOUBLE COMMA QUOTATION MARK ORNAMENT
   '\u301d': '"', // REVERSED DOUBLE PRIME QUOTATION MARK
@@ -256,13 +257,12 @@ const SmartEncodingMap: {
   '\u0013': '', // DEVICE CONTROL THREE
   '\u0014': '', // DEVICE CONTROL FOUR
   '\u2060': '', // WORD JOINER
-  '\u2017': "'", // Horizontal ellipsis
-  '\u2014': '-', // Single low-9 quotation mark
-  '\u2013': '-', // Single high-reversed-9 quotation mark
+  '\u2017': '_', // DOUBLE LOW LINE
+  '\u2014': '-', // EM DASH
+  '\u2013': '-', // EN DASH
   '\u2039': '>', // Single left-pointing angle quotation mark
   '\u203A': '<', // Single right-pointing angle quotation mark
   '\u203C': '!!', // Double exclamation mark
-  '\u201E': '"', // Double low line
   '\u2028': ' ', // Whitespace: Line Separator
   '\u2029': ' ', // Whitespace: Paragraph Separator
   '\u2026': '...', // Whitespace: Narrow No-Break Space
