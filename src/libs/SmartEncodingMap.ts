@@ -268,6 +268,7 @@ const SmartEncodingMap: {
   '\u2026': '...', // Whitespace: Narrow No-Break Space
   '\u2001': ' ', // Whitespace: Medium Mathematical Space
   '\u200b': '', // ZERO WIDTH SPACE
+  '\u200c': '', // ZERO WIDTH NON-JOINER
   '\u3001': ',', // IDEOGRAPHIC COMMA
   '\uFEFF': '', // ZERO WIDTH NO-BREAK SPACE
   '\u2022': '-', // Bullet
