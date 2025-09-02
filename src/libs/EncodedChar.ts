@@ -1,4 +1,4 @@
-import UnicodeToGsm from './UnicodeToGSM';
+import { UnicodeToGsm } from './UnicodeToGSM';
 
 /**
  * Encoded Character Classes

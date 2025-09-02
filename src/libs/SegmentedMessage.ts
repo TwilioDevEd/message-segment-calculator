@@ -2,7 +2,7 @@ import GraphemeSplitter from 'grapheme-splitter';
 
 import Segment from './Segment';
 import EncodedChar from './EncodedChar';
-import UnicodeToGsm from './UnicodeToGSM';
+import { UnicodeToGsm, UnicodeToGsmMY } from './UnicodeToGSM';
 import SmartEncodingMap from './SmartEncodingMap';
 
 type SmsEncoding = 'GSM-7' | 'UCS-2';
@@ -42,10 +42,16 @@ export class SegmentedMessage {
    * @param {string} message Body of the message
    * @param {boolean} [encoding] Optional: encoding. It can be 'GSM-7', 'UCS-2', 'auto'. Default value: 'auto'
    * @param {boolean} smartEncoding Optional: whether or not Twilio's [Smart Encoding](https://www.twilio.com/docs/messaging/services#smart-encoding) is emulated. Default value: false
+   * @param {string} countryCode Optional: whether to follow Malaysian encoding rules. Default value: 'US'
    * @property {number} numberOfUnicodeScalars  Number of Unicode Scalars (i.e. unicode pairs) the message is made of
    *
    */
-  constructor(message: string, encoding: SmsEncoding | 'auto' = 'auto', smartEncoding: boolean = false) {
+  constructor(
+    message: string,
+    encoding: SmsEncoding | 'auto' = 'auto',
+    smartEncoding: boolean = false,
+    countryCode: string = 'US',
+  ) {
     const splitter = new GraphemeSplitter();
 
     if (!validEncodingValues.includes(encoding)) {
@@ -82,9 +88,9 @@ export class SegmentedMessage {
       /**
        * @property {string} encodingName Calculated encoding name. It can be: "GSM-7" or "UCS-2"
        */
-      this.encodingName = this._hasAnyUCSCharacters(this.graphemes) ? 'UCS-2' : 'GSM-7';
+      this.encodingName = this._hasAnyUCSCharacters(this.graphemes, countryCode) ? 'UCS-2' : 'GSM-7';
     } else {
-      if (encoding === 'GSM-7' && this._hasAnyUCSCharacters(this.graphemes)) {
+      if (encoding === 'GSM-7' && this._hasAnyUCSCharacters(this.graphemes, countryCode)) {
         throw new Error('The string provided is incompatible with GSM-7 encoding');
       }
       this.encodingName = this.encoding;
@@ -125,10 +131,18 @@ export class SegmentedMessage {
    * @returns {boolean} True if there are non-GSM-7 characters
    * @private
    */
-  _hasAnyUCSCharacters(graphemes: string[]): boolean {
+  _hasAnyUCSCharacters(graphemes: string[], countryCode: string): boolean {
     let result = false;
+    let uniCodeArr: Record<string, Array<number>> = {};
+
+    if (countryCode === 'MY') {
+      uniCodeArr = UnicodeToGsmMY;
+    } else {
+      uniCodeArr = UnicodeToGsm;
+    }
+
     for (const grapheme of graphemes) {
-      if (grapheme.length >= 2 || (grapheme.length === 1 && !UnicodeToGsm[grapheme.charCodeAt(0)])) {
+      if (grapheme.length >= 2 || (grapheme.length === 1 && !uniCodeArr[grapheme.charCodeAt(0)])) {
         result = true;
         break;
       }

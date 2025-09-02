@@ -107,6 +107,19 @@ const TestData = [
   },
 ];
 
+const TestDataMalaysia = [
+  {
+    testDescription: 'UCS-2 with special latin characters',
+    body: 'Hi I am john, this is my message in MY sms format é, this should generate to 2 segments and be formatted in UCS-2',
+    encoding: 'UCS-2',
+    segments: 2,
+    messageSize: 1808,
+    totalSize: 1904,
+    characters: 113,
+    unicodeScalars: 113,
+  },
+];
+
 describe('Smart Encoding', () => {
   test.each(Object.entries(SmartEncodingMap))('With Smart Encoding enabled - maps %s to %s', (key, value) => {
     const segmentedMessage = new SegmentedMessage(key, 'auto', true);
@@ -128,6 +141,19 @@ describe('Basic tests', () => {
   TestData.forEach((testMessage) => {
     test(testMessage.testDescription, () => {
       const segmentedMessage = new SegmentedMessage(testMessage.body);
+      expect(segmentedMessage.encodingName).toBe(testMessage.encoding);
+      expect(segmentedMessage.segments.length).toBe(testMessage.segments);
+      expect(segmentedMessage.segmentsCount).toBe(testMessage.segments);
+      expect(segmentedMessage.messageSize).toBe(testMessage.messageSize);
+      expect(segmentedMessage.totalSize).toBe(testMessage.totalSize);
+      expect(segmentedMessage.numberOfUnicodeScalars).toBe(testMessage.unicodeScalars);
+      expect(segmentedMessage.numberOfCharacters).toBe(testMessage.characters);
+    });
+  });
+
+  TestDataMalaysia.forEach((testMessage) => {
+    test(testMessage.testDescription, () => {
+      const segmentedMessage = new SegmentedMessage(testMessage.body, 'auto', false, 'MY');
       expect(segmentedMessage.encodingName).toBe(testMessage.encoding);
       expect(segmentedMessage.segments.length).toBe(testMessage.segments);
       expect(segmentedMessage.segmentsCount).toBe(testMessage.segments);
