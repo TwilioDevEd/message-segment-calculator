@@ -14,7 +14,11 @@ var EncodedChar = /** @class */ (function () {
         this.encoding = encoding;
         this.isGSM7 = Boolean(char && char.length === 1 && UnicodeToGSM_1.default[char.charCodeAt(0)]);
         if (this.isGSM7) {
-            this.codeUnits = UnicodeToGSM_1.default[char.charCodeAt(0)];
+            /*
+             * In UCS-2 encoding, store the actual Unicode code point (1 unit per char)
+             * instead of the GSM-7 extension mapping (which uses 2 units for chars like |, ^, {)
+             */
+            this.codeUnits = encoding === 'UCS-2' ? [char.charCodeAt(0)] : UnicodeToGSM_1.default[char.charCodeAt(0)];
         }
         else {
             this.codeUnits = [];
