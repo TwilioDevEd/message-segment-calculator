@@ -26,4 +26,4 @@
 |-------|---------|-------------|
 | Claude Code | Approve | Clean surgical fix, no regressions |
 | Copilot | No blockers | Comment wording nit (resolved) |
-| Codex | Pending | Review in progress |
+| Codex | Approve | No functional, security, or maintainability blockers |
