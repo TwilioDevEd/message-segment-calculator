@@ -12,13 +12,12 @@
 
 ## Human-Judgment Items
 
-- [ ] **Verify fix on GitHub Pages** — After merge, load https://twiliodeved.github.io/message-segment-calculator/ and enter `||||||||||||||||||||||||{||||||||||||||||||||||||||||∞||||||||||^|||||`. Confirm it shows 70/70 (not 139/70).
+- [ ] **Verify fix locally** — Clone the branch, run `npm start`, and enter `||||||||||||||||||||||||{||||||||||||||||||||||||||||∞||||||||||^|||||`. Confirm it shows 70/70 (not 139/70).
 - [ ] **Verify segment bar** — Confirm the segment bar visualization looks correct (fills proportionally, not overflowing).
 - [ ] **Edge cases** — Try messages with:
   - Only GSM extension chars (e.g., `||||^^^^`) — should stay GSM-7 encoding, count correctly
   - Mix of extension + emoji (e.g., `|^{😀`) — should be UCS-2, each char = 1 unit
   - Empty message, single char, boundary (70 chars exactly in UCS-2)
-- [ ] **npm publish** — Decide if this warrants a patch version bump and npm publish
 - [ ] **Close GitHub issue #57** — After merge, close with reference to this PR
 
 ## Prior Agent Reviews
