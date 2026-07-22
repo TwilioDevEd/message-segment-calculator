@@ -1,7 +1,7 @@
 # Messaging Segment Calculator (SMS + RCS)
 
 This repo contains a package for SMS and RCS segment calculations. The package is released as a nodeJS package as well as a browser script.
-A browser demo for this package can be accessed [here](https://twiliodeved.github.io/message-segment-calculator/)
+Want to see it in action? [Try the live Segment Calculator](https://twil.io/iY0Jwws) to see how any message is encoded and how many segments it takes.
 
 ## Usage 
 
