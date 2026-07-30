@@ -217,6 +217,23 @@ describe('Line break styles tests', () => {
     expect(segmentedMessage.numberOfCharacters).toBe(12);
   });
 
+  // Tests for https://github.com/TwilioDevEd/message-segment-calculator/issues/67
+  test('lineBreakStyle is undefined when there are no line breaks', () => {
+    expect(new SegmentedMessage('abcde').lineBreakStyle).toBeUndefined();
+  });
+
+  test('lineBreakStyle is LF for messages with only Unix line breaks', () => {
+    expect(new SegmentedMessage('abc\ndef').lineBreakStyle).toBe('LF');
+  });
+
+  test('lineBreakStyle is CRLF for messages with only Windows line breaks', () => {
+    expect(new SegmentedMessage('abc\r\ndef').lineBreakStyle).toBe('CRLF');
+  });
+
+  test('lineBreakStyle is LF+CRLF for messages that mix both styles', () => {
+    expect(new SegmentedMessage('abc\r\ndef\nghi').lineBreakStyle).toBe('LF+CRLF');
+  });
+
   test('Triple accents characters - Unicode test', () => {
     const testMessage = 'é́́';
     const segmentedMessage = new SegmentedMessage(testMessage);

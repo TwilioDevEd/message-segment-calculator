@@ -246,9 +246,14 @@ export class SegmentedMessage {
    */
   _detectLineBreakStyle(message: string): LineBreakStyle {
     const hasWindowsStyle = message.includes('\r\n');
-    const HasUnixStyle = message.includes('\n');
-    const mixedStyle = hasWindowsStyle && HasUnixStyle;
-    const noBreakLine = !hasWindowsStyle && !HasUnixStyle;
+    /*
+     * A lone LF is any '\n' that remains once CRLF pairs are removed. Testing
+     * the raw string for '\n' would always match CRLF input (since '\r\n'
+     * contains '\n'), which previously made the 'CRLF' branch unreachable.
+     */
+    const hasUnixStyle = message.replace(/\r\n/g, '').includes('\n');
+    const mixedStyle = hasWindowsStyle && hasUnixStyle;
+    const noBreakLine = !hasWindowsStyle && !hasUnixStyle;
 
     if (noBreakLine) {
       return undefined;
@@ -256,7 +261,7 @@ export class SegmentedMessage {
     if (mixedStyle) {
       return 'LF+CRLF';
     }
-    return HasUnixStyle ? 'LF' : 'CRLF';
+    return hasWindowsStyle ? 'CRLF' : 'LF';
   }
 
   /**
