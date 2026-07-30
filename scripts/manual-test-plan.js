@@ -117,6 +117,12 @@ function resolveCredentials() {
 
   if (!accountSid) return { error: 'TWILIO_ACCOUNT_SID is required (identifies the account in the request URL).' };
 
+  // A half-configured API key pair is almost always a typo. Fail loudly rather
+  // than silently falling back to the broader-privilege auth token.
+  if (Boolean(apiKey) !== Boolean(apiSecret)) {
+    return { error: 'TWILIO_API_KEY and TWILIO_API_SECRET must be set together (only one was provided).' };
+  }
+
   let username;
   let password;
   let mode;

@@ -30,24 +30,20 @@ node scripts/manual-test-plan.js --dry-run --only 1a,2b,5e
 
 A live run sends each input from your Twilio account, polls the Message resource, and diffs `num_segments` against the prediction. Credentials are read from the environment only. Nothing is hard-coded.
 
-For authentication, Twilio recommends an [API key](https://www.twilio.com/docs/usage/requests-to-twilio) SID and secret pair. The script prefers that pair and falls back to the account auth token. The Account SID is always required regardless, because it identifies the account in the request URL path (the API key SID does not replace it).
+For authentication, Twilio recommends an [API key](https://www.twilio.com/docs/usage/requests-to-twilio) SID and secret pair. The script prefers that pair and falls back to the account Auth Token. The Account SID is always required regardless, because it identifies the account in the request URL path (the API key SID does not replace it).
 
 #### Generating an API key
 
-If you don't have an API key yet, create a **Standard** key in the [Twilio Console](https://www.twilio.com/docs/iam/api-keys/keys-in-console) under **Account** > **API keys & tokens**. This keeps your Account SID and Auth Token out of this script and its environment. The secret is shown only once and is never retrievable again, so copy the `sid` (`SK...`) and `secret` immediately into the `TWILIO_API_KEY` / `TWILIO_API_SECRET` exports below.
+If you don't have an API key yet, create one in the [Twilio Console](https://www.twilio.com/docs/iam/api-keys/keys-in-console) under **Account** > **API keys & tokens**. This keeps your Account SID and Auth Token out of this script and its environment. The secret is shown only once and is never retrievable again, so copy the `sid` (`SK...`) and `secret` immediately into the `TWILIO_API_KEY` / `TWILIO_API_SECRET` exports below.
 
-You can also create a key with the [Twilio CLI](https://www.twilio.com/docs/twilio-cli/quickstart) if you have it working:
-
-```bash
-twilio api:core:keys:create --friendly-name "segment-calc-manual-test" -o json
-```
+Prefer a [Restricted key](https://www.twilio.com/docs/iam/api-keys/restricted-api-keys) scoped to just what this script does: Messages create and read. That grants far less than a Standard key, which can reach nearly every Twilio API. You can create Restricted keys only in the US region. On other regions, fall back to a Standard key.
 
 | Env var | Required | Purpose |
 |---|---|---|
 | `TWILIO_ACCOUNT_SID` | yes | Account SID (`AC...`). Used in the request URL path. |
 | `TWILIO_API_KEY` | preferred | API key SID (`SK...`), used as the Basic-auth username. |
 | `TWILIO_API_SECRET` | preferred | API key secret, used as the Basic-auth password. |
-| `TWILIO_AUTH_TOKEN` | fallback | Auth token. Used only when no API key pair is set. |
+| `TWILIO_AUTH_TOKEN` | fallback | Auth Token. Used only when no API key pair is set. |
 | `TWILIO_FROM` | yes | Sending number or Messaging Service SID (`MG...`) |
 | `TWILIO_TO` | yes | Destination test number |
 | `TWILIO_FROM_SMART` | no | Messaging Service SID with Smart Encoding ON, used for the Class 3 "smart ON" cases (3b, 3d). Those cases self-skip if unset. |
