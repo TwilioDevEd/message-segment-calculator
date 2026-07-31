@@ -29,6 +29,7 @@
     "release": "tsc && webpack --config webpack.config.js",
     "test:e2e": "npx playwright test",
     "test:e2e:ui": "npx playwright test --ui",
+    "test:manual": "node scripts/manual-test-plan.js",
     "prepare": "husky"
   },
   "jest": {
