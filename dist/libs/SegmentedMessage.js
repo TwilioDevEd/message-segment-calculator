@@ -317,7 +317,7 @@ var SegmentedMessage = /** @class */ (function () {
         if (mixedStyle) {
             return 'LF+CRLF';
         }
-        return hasWindowsStyle ? 'CRLF' : 'LF';
+        return hasUnixStyle ? 'LF' : 'CRLF';
     };
     /**
      * Internal method to check the line break styled used in the passed message

@@ -261,7 +261,7 @@ export class SegmentedMessage {
     if (mixedStyle) {
       return 'LF+CRLF';
     }
-    return hasWindowsStyle ? 'CRLF' : 'LF';
+    return hasUnixStyle ? 'LF' : 'CRLF';
   }
 
   /**

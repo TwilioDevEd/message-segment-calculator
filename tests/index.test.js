@@ -234,6 +234,24 @@ describe('Line break styles tests', () => {
     expect(new SegmentedMessage('abc\r\ndef\nghi').lineBreakStyle).toBe('LF+CRLF');
   });
 
+  // Real-world case (via PR #52): the same message costs an extra segment with
+  // CRLF because each \r\n counts as 2 characters, pushing it over 160.
+  test('Real-world message: CRLF bills 2 segments, LF bills 1', () => {
+    const crlf =
+      "Ce weekend c'est Big Kiff ! Découvrez vite 4 nouveaux menus à partager:\r\nl.dominos.fr/MqGKjT0Vi2\r\nConditions sur le site Domino's.\r\nSTOP : l.dominos.fr/oIv05Yymdm";
+    const lf = crlf.replace(/\r\n/g, '\n');
+
+    const crlfMessage = new SegmentedMessage(crlf);
+    expect(crlfMessage.lineBreakStyle).toBe('CRLF');
+    expect(crlfMessage.numberOfCharacters).toBe(162);
+    expect(crlfMessage.segmentsCount).toBe(2);
+
+    const lfMessage = new SegmentedMessage(lf);
+    expect(lfMessage.lineBreakStyle).toBe('LF');
+    expect(lfMessage.numberOfCharacters).toBe(159);
+    expect(lfMessage.segmentsCount).toBe(1);
+  });
+
   test('Triple accents characters - Unicode test', () => {
     const testMessage = 'é́́';
     const segmentedMessage = new SegmentedMessage(testMessage);
