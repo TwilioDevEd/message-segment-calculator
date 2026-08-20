@@ -303,16 +303,21 @@ var SegmentedMessage = /** @class */ (function () {
      */
     SegmentedMessage.prototype._detectLineBreakStyle = function (message) {
         var hasWindowsStyle = message.includes('\r\n');
-        var HasUnixStyle = message.includes('\n');
-        var mixedStyle = hasWindowsStyle && HasUnixStyle;
-        var noBreakLine = !hasWindowsStyle && !HasUnixStyle;
+        /*
+         * A lone LF is any '\n' that remains once CRLF pairs are removed. Testing
+         * the raw string for '\n' would always match CRLF input (since '\r\n'
+         * contains '\n'), which previously made the 'CRLF' branch unreachable.
+         */
+        var hasUnixStyle = message.replace(/\r\n/g, '').includes('\n');
+        var mixedStyle = hasWindowsStyle && hasUnixStyle;
+        var noBreakLine = !hasWindowsStyle && !hasUnixStyle;
         if (noBreakLine) {
             return undefined;
         }
         if (mixedStyle) {
             return 'LF+CRLF';
         }
-        return HasUnixStyle ? 'LF' : 'CRLF';
+        return hasUnixStyle ? 'LF' : 'CRLF';
     };
     /**
      * Internal method to check the line break styled used in the passed message
