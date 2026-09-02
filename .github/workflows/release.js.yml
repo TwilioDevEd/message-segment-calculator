@@ -9,11 +9,11 @@ on:
 jobs: 
   release:
     if: "!contains(github.event.commits[0].message, '[skip ci]')"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-x64
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
+      - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
         with:
           node-version: '18'    
 
@@ -31,7 +31,7 @@ jobs:
         
       - name: Run automated release process with semantic-release
         if: github.event_name == 'push'
-        uses: cycjimmy/semantic-release-action@v3
+        uses: cycjimmy/semantic-release-action@8e58d20d0f6c8773181f43eb74d6a05e3099571d # v3.4.2
         with:
           extra_plugins: |
             @semantic-release/changelog
