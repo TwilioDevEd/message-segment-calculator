@@ -67,6 +67,9 @@ var extractCharDetails = function (segmentedMessage, encodingName) {
 var analyzeSms = function (message, encoding, smartEncoding) {
     var segmentedMessage = new SegmentedMessage_1.SegmentedMessage(message, encoding, smartEncoding);
     var encodingName = segmentedMessage.encodingName, segmentsCount = segmentedMessage.segmentsCount;
+    var crlfSegmentsCount = segmentedMessage.lineBreakStyle === 'LF'
+        ? new SegmentedMessage_1.SegmentedMessage(message.split('\n').join('\r\n'), encoding, smartEncoding).segmentsCount
+        : segmentsCount;
     var encodingKind = encodingName === 'GSM-7' ? 'gsm7' : 'unicode';
     var capacity = getSmsCapacity(encodingName, segmentsCount);
     var segments = segmentedMessage.segments.map(function (segment, index) { return ({
@@ -87,7 +90,9 @@ var analyzeSms = function (message, encoding, smartEncoding) {
         totalSize: segmentedMessage.totalSize,
         unicodeScalars: segmentedMessage.numberOfUnicodeScalars,
         nonGsmCharacters: segmentedMessage.getNonGsmCharacters(),
-        warnings: segmentedMessage.warnings,
+        warnings: crlfSegmentsCount > segmentsCount
+            ? ["LF segment count: ".concat(segmentsCount, "; CRLF may use ").concat(crlfSegmentsCount, " and affect pricing.")]
+            : [],
         charDetails: extractCharDetails(segmentedMessage, encodingName),
     };
 };
