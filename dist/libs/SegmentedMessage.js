@@ -323,11 +323,19 @@ var SegmentedMessage = /** @class */ (function () {
      * Internal method to warn when the message's line-break style costs more segments than the
      * alternative would (CRLF vs. LF), since CRLF counts as two characters per line break and LF as one.
      *
-     * @param {string} message Body of the message (post smart-encoding substitution)
+     * @param {string} [message] Body of the message (post smart-encoding substitution). Kept optional
+     * for compatibility with the previous zero-argument signature of this method.
      * @returns {string[]} Warnings applicable to this message
      * @private
      */
     SegmentedMessage.prototype._checkForWarnings = function (message) {
+        if (message === undefined) {
+            return this.lineBreakStyle
+                ? [
+                    'The message has line breaks, the web page utility only supports LF style. If you insert a CRLF it will be converted to LF.',
+                ]
+                : [];
+        }
         var warnings = [];
         if (this.lineBreakStyle === 'CRLF' || this.lineBreakStyle === 'LF+CRLF') {
             var lfSegmentsCount = this._segmentsCountFor(message.replace(/\r\n/g, '\n'));

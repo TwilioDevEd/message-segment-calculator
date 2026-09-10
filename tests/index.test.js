@@ -274,6 +274,14 @@ describe('Line break styles tests', () => {
     expect(message.warnings).toEqual(warnings);
   });
 
+  test('_checkForWarnings() called with no argument keeps its previous behavior', () => {
+    const message = new SegmentedMessage('a\nb');
+    expect(message._checkForWarnings()).toEqual([
+      'The message has line breaks, the web page utility only supports LF style. If you insert a CRLF it will be converted to LF.',
+    ]);
+    expect(new SegmentedMessage('abcde')._checkForWarnings()).toEqual([]);
+  });
+
   test('Triple accents characters - Unicode test', () => {
     const testMessage = 'é́́';
     const segmentedMessage = new SegmentedMessage(testMessage);
