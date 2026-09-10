@@ -116,7 +116,7 @@ var SegmentedMessage = /** @class */ (function () {
         /**
          * @property {string[]} warnings message line break style
          */
-        this.warnings = this._checkForWarnings();
+        this.warnings = this._checkForWarnings(message);
     }
     /**
      * Internal method to check if the message has any non-GSM7 characters
@@ -320,17 +320,37 @@ var SegmentedMessage = /** @class */ (function () {
         return hasUnixStyle ? 'LF' : 'CRLF';
     };
     /**
-     * Internal method to check the line break styled used in the passed message
+     * Internal method to warn when the message's line-break style costs more segments than the
+     * alternative would (CRLF vs. LF), since CRLF counts as two characters per line break and LF as one.
      *
-     * @returns {string[]} The libre break style name LF or CRLF
+     * @param {string} message Body of the message (post smart-encoding substitution)
+     * @returns {string[]} Warnings applicable to this message
      * @private
      */
-    SegmentedMessage.prototype._checkForWarnings = function () {
+    SegmentedMessage.prototype._checkForWarnings = function (message) {
         var warnings = [];
-        if (this.lineBreakStyle) {
-            warnings.push('The message has line breaks, the web page utility only supports LF style. If you insert a CRLF it will be converted to LF.');
+        if (this.lineBreakStyle === 'CRLF' || this.lineBreakStyle === 'LF+CRLF') {
+            var lfSegmentsCount = this._segmentsCountFor(message.replace(/\r\n/g, '\n'));
+            if (this.segmentsCount > lfSegmentsCount) {
+                warnings.push("CRLF segment count: ".concat(this.segmentsCount, "; LF segment count: ").concat(lfSegmentsCount, ". CRLF line breaks may increase pricing."));
+            }
+        }
+        else if (this.lineBreakStyle === 'LF') {
+            var crlfSegmentsCount = this._segmentsCountFor(message.replace(/\n/g, '\r\n'));
+            if (crlfSegmentsCount > this.segmentsCount) {
+                warnings.push("LF segment count: ".concat(this.segmentsCount, "; CRLF may use ").concat(crlfSegmentsCount, " and affect pricing."));
+            }
         }
         return warnings;
+    };
+    /**
+     * @param {string} message Line-break variant of the message body
+     * @returns {number} Segment count for that variant
+     * @private
+     */
+    SegmentedMessage.prototype._segmentsCountFor = function (message) {
+        var encodedChars = this._encodeChars((0, textUtils_1.splitGraphemes)(message));
+        return this._buildSegments(encodedChars).length;
     };
     return SegmentedMessage;
 }());

@@ -56,10 +56,6 @@ const extractCharDetails = (segmentedMessage: SegmentedMessage, encodingName: 'G
 export const analyzeSms = (message: string, encoding: SmsEncodingSetting, smartEncoding: boolean): SmsAnalysis => {
   const segmentedMessage = new SegmentedMessage(message, encoding, smartEncoding);
   const { encodingName, segmentsCount } = segmentedMessage;
-  const crlfSegmentsCount =
-    segmentedMessage.lineBreakStyle === 'LF'
-      ? new SegmentedMessage(message.split('\n').join('\r\n'), encoding, smartEncoding).segmentsCount
-      : segmentsCount;
   const encodingKind = encodingName === 'GSM-7' ? 'gsm7' : 'unicode';
   const capacity = getSmsCapacity(encodingName, segmentsCount);
   const segments: SegmentData[] = segmentedMessage.segments.map((segment, index) => ({
@@ -81,10 +77,7 @@ export const analyzeSms = (message: string, encoding: SmsEncodingSetting, smartE
     totalSize: segmentedMessage.totalSize,
     unicodeScalars: segmentedMessage.numberOfUnicodeScalars,
     nonGsmCharacters: segmentedMessage.getNonGsmCharacters(),
-    warnings:
-      crlfSegmentsCount > segmentsCount
-        ? [`LF segment count: ${segmentsCount}; CRLF may use ${crlfSegmentsCount} and affect pricing.`]
-        : [],
+    warnings: segmentedMessage.warnings,
     charDetails: extractCharDetails(segmentedMessage, encodingName),
   };
 };
