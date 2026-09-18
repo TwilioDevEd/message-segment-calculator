@@ -245,41 +245,11 @@ describe('Line break styles tests', () => {
     expect(crlfMessage.lineBreakStyle).toBe('CRLF');
     expect(crlfMessage.numberOfCharacters).toBe(162);
     expect(crlfMessage.segmentsCount).toBe(2);
-    expect(crlfMessage.warnings).toEqual([
-      'CRLF segment count: 2; LF segment count: 1. CRLF line breaks may increase pricing.',
-    ]);
 
     const lfMessage = new SegmentedMessage(lf);
     expect(lfMessage.lineBreakStyle).toBe('LF');
     expect(lfMessage.numberOfCharacters).toBe(159);
     expect(lfMessage.segmentsCount).toBe(1);
-    // Sending this LF message as CRLF would push it to 2 segments, so it warns too.
-    expect(lfMessage.warnings).toEqual(['LF segment count: 1; CRLF may use 2 and affect pricing.']);
-  });
-
-  test.each([
-    ['CRLF under the segment boundary', 'a\r\nb', 'CRLF', 1, []],
-    ['LF+CRLF under the segment boundary', 'a\r\nb\nc', 'LF+CRLF', 1, []],
-    [
-      'LF+CRLF over the segment boundary',
-      `\r\n${'a'.repeat(157)}\nb`,
-      'LF+CRLF',
-      2,
-      ['CRLF segment count: 2; LF segment count: 1. CRLF line breaks may increase pricing.'],
-    ],
-  ])('%s', (_description, body, style, segments, warnings) => {
-    const message = new SegmentedMessage(body);
-    expect(message.lineBreakStyle).toBe(style);
-    expect(message.segmentsCount).toBe(segments);
-    expect(message.warnings).toEqual(warnings);
-  });
-
-  test('_checkForWarnings() called with no argument keeps its previous behavior', () => {
-    const message = new SegmentedMessage('a\nb');
-    expect(message._checkForWarnings()).toEqual([
-      'The message has line breaks, the web page utility only supports LF style. If you insert a CRLF it will be converted to LF.',
-    ]);
-    expect(new SegmentedMessage('abcde')._checkForWarnings()).toEqual([]);
   });
 
   test('Triple accents characters - Unicode test', () => {

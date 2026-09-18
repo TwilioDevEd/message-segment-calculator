@@ -108,7 +108,7 @@ export class SegmentedMessage {
     /**
      * @property {string[]} warnings message line break style
      */
-    this.warnings = this._checkForWarnings(message);
+    this.warnings = this._checkForWarnings();
   }
 
   /**
@@ -265,46 +265,18 @@ export class SegmentedMessage {
   }
 
   /**
-   * Internal method to warn when the message's line-break style costs more segments than the
-   * alternative would (CRLF vs. LF), since CRLF counts as two characters per line break and LF as one.
+   * Internal method to check the line break styled used in the passed message
    *
-   * @param {string} [message] Body of the message (post smart-encoding substitution). Kept optional
-   * for compatibility with the previous zero-argument signature of this method.
-   * @returns {string[]} Warnings applicable to this message
+   * @returns {string[]} The libre break style name LF or CRLF
    * @private
    */
-  _checkForWarnings(message?: string): string[] {
-    if (message === undefined) {
-      return this.lineBreakStyle
-        ? [
-            'The message has line breaks, the web page utility only supports LF style. If you insert a CRLF it will be converted to LF.',
-          ]
-        : [];
-    }
-    const warnings: string[] = [];
-    if (this.lineBreakStyle === 'CRLF' || this.lineBreakStyle === 'LF+CRLF') {
-      const lfSegmentsCount = this._segmentsCountFor(message.replace(/\r\n/g, '\n'));
-      if (this.segmentsCount > lfSegmentsCount) {
-        warnings.push(
-          `CRLF segment count: ${this.segmentsCount}; LF segment count: ${lfSegmentsCount}. CRLF line breaks may increase pricing.`,
-        );
-      }
-    } else if (this.lineBreakStyle === 'LF') {
-      const crlfSegmentsCount = this._segmentsCountFor(message.replace(/\n/g, '\r\n'));
-      if (crlfSegmentsCount > this.segmentsCount) {
-        warnings.push(`LF segment count: ${this.segmentsCount}; CRLF may use ${crlfSegmentsCount} and affect pricing.`);
-      }
+  _checkForWarnings(): string[] {
+    const warnings = [];
+    if (this.lineBreakStyle) {
+      warnings.push(
+        'The message has line breaks, the web page utility only supports LF style. If you insert a CRLF it will be converted to LF.',
+      );
     }
     return warnings;
-  }
-
-  /**
-   * @param {string} message Line-break variant of the message body
-   * @returns {number} Segment count for that variant
-   * @private
-   */
-  _segmentsCountFor(message: string): number {
-    const encodedChars = this._encodeChars(splitGraphemes(message));
-    return this._buildSegments(encodedChars).length;
   }
 }

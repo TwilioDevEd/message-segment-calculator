@@ -91,20 +91,11 @@ export declare class SegmentedMessage {
      */
     _detectLineBreakStyle(message: string): LineBreakStyle;
     /**
-     * Internal method to warn when the message's line-break style costs more segments than the
-     * alternative would (CRLF vs. LF), since CRLF counts as two characters per line break and LF as one.
+     * Internal method to check the line break styled used in the passed message
      *
-     * @param {string} [message] Body of the message (post smart-encoding substitution). Kept optional
-     * for compatibility with the previous zero-argument signature of this method.
-     * @returns {string[]} Warnings applicable to this message
+     * @returns {string[]} The libre break style name LF or CRLF
      * @private
      */
-    _checkForWarnings(message?: string): string[];
-    /**
-     * @param {string} message Line-break variant of the message body
-     * @returns {number} Segment count for that variant
-     * @private
-     */
-    _segmentsCountFor(message: string): number;
+    _checkForWarnings(): string[];
 }
 export {};
