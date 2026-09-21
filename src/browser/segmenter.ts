@@ -18,6 +18,36 @@ const getSmsCapacity = (encodingName: 'GSM-7' | 'UCS-2', segmentsCount: number):
   return segmentsCount > 1 ? 67 : 70;
 };
 
+/*
+ * `\r` and `\n` are both single-code-unit characters in GSM-7 and UCS-2 (see UnicodeToGSM.ts),
+ * so converting a lone LF to CRLF always adds exactly one code unit per line break - the resulting
+ * segment count can be derived from the character total instead of re-segmenting the message.
+ */
+const segmentsCountForCharacters = (characters: number, encodingName: 'GSM-7' | 'UCS-2'): number => {
+  const singleSegmentCapacity = getSmsCapacity(encodingName, 1);
+  if (characters <= singleSegmentCapacity) {
+    return 1;
+  }
+  return Math.ceil(characters / getSmsCapacity(encodingName, 2));
+};
+
+const getCrlfWarning = (
+  message: string,
+  segmentedMessage: SegmentedMessage,
+  encodingName: 'GSM-7' | 'UCS-2',
+): string[] => {
+  if (segmentedMessage.lineBreakStyle !== 'LF') {
+    return [];
+  }
+  const lineBreakCount = (message.match(/\n/g) || []).length;
+  const crlfCharacters = segmentedMessage.numberOfCharacters + lineBreakCount;
+  const crlfSegmentsCount = segmentsCountForCharacters(crlfCharacters, encodingName);
+  if (crlfSegmentsCount <= segmentedMessage.segmentsCount) {
+    return [];
+  }
+  return [`LF segment count: ${segmentedMessage.segmentsCount}; CRLF may use ${crlfSegmentsCount} and affect pricing.`];
+};
+
 const countSegmentUsed = (segment: SegmentElement[]): number => {
   return segment.reduce((total, item) => {
     if (item.isReservedChar) {
@@ -77,7 +107,7 @@ export const analyzeSms = (message: string, encoding: SmsEncodingSetting, smartE
     totalSize: segmentedMessage.totalSize,
     unicodeScalars: segmentedMessage.numberOfUnicodeScalars,
     nonGsmCharacters: segmentedMessage.getNonGsmCharacters(),
-    warnings: segmentedMessage.warnings,
+    warnings: [...segmentedMessage.warnings, ...getCrlfWarning(message, segmentedMessage, encodingName)],
     charDetails: extractCharDetails(segmentedMessage, encodingName),
   };
 };

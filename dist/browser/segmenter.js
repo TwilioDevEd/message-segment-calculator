@@ -10,6 +10,31 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.analyzeRcs = exports.analyzeSms = void 0;
 var SegmentedMessage_1 = require("../libs/SegmentedMessage");
@@ -19,6 +44,30 @@ var getSmsCapacity = function (encodingName, segmentsCount) {
         return segmentsCount > 1 ? 153 : 160;
     }
     return segmentsCount > 1 ? 67 : 70;
+};
+/*
+ * `\r` and `\n` are both single-code-unit characters in GSM-7 and UCS-2 (see UnicodeToGSM.ts),
+ * so converting a lone LF to CRLF always adds exactly one code unit per line break - the resulting
+ * segment count can be derived from the character total instead of re-segmenting the message.
+ */
+var segmentsCountForCharacters = function (characters, encodingName) {
+    var singleSegmentCapacity = getSmsCapacity(encodingName, 1);
+    if (characters <= singleSegmentCapacity) {
+        return 1;
+    }
+    return Math.ceil(characters / getSmsCapacity(encodingName, 2));
+};
+var getCrlfWarning = function (message, segmentedMessage, encodingName) {
+    if (segmentedMessage.lineBreakStyle !== 'LF') {
+        return [];
+    }
+    var lineBreakCount = (message.match(/\n/g) || []).length;
+    var crlfCharacters = segmentedMessage.numberOfCharacters + lineBreakCount;
+    var crlfSegmentsCount = segmentsCountForCharacters(crlfCharacters, encodingName);
+    if (crlfSegmentsCount <= segmentedMessage.segmentsCount) {
+        return [];
+    }
+    return ["LF segment count: ".concat(segmentedMessage.segmentsCount, "; CRLF may use ").concat(crlfSegmentsCount, " and affect pricing.")];
 };
 var countSegmentUsed = function (segment) {
     return segment.reduce(function (total, item) {
@@ -87,7 +136,7 @@ var analyzeSms = function (message, encoding, smartEncoding) {
         totalSize: segmentedMessage.totalSize,
         unicodeScalars: segmentedMessage.numberOfUnicodeScalars,
         nonGsmCharacters: segmentedMessage.getNonGsmCharacters(),
-        warnings: segmentedMessage.warnings,
+        warnings: __spreadArray(__spreadArray([], __read(segmentedMessage.warnings), false), __read(getCrlfWarning(message, segmentedMessage, encodingName)), false),
         charDetails: extractCharDetails(segmentedMessage, encodingName),
     };
 };
