@@ -55,6 +55,10 @@ main {
   font-size: 12px;
 }
 
+.page-footer a {
+  color: var(--color-text-link);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
