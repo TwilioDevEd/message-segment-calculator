@@ -72,6 +72,8 @@ Total size of the message in bits (excluding User Data Header if present)
 
 Number of segment(s)
 
+> **Note:** Multi-segment messages carry 153 characters per segment for GSM-7 and 67 for UCS-2. As an exception, toll-free multi-segment SMS sent to the US or Canada support 152 characters per segment for GSM-7 and 66 for UCS-2. This calculator uses the standard 153/67 limits. See [SMS character limits](https://www.twilio.com/docs/glossary/what-sms-character-limit#messages-longer-than-160-bytes).
+
 ### [`getNonGsmCharacters()`]
 
 Return an array with the non GSM-7 characters in the body. It can be used to replace character and reduce the number of segments 
