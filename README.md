@@ -152,6 +152,6 @@ We used the Kimoby SMS Segment Counter as visual inspiration: https://www.kimoby
 
 This project is provided for educational and estimation purposes only. No warranty expressed or implied. Software is as is.
 
-Segment counts and encodings produced by this library and the browser calculator are estimates and are not a guarantee of how messages will be segmented or billed. Actual segmentation can vary by sender type, destination, and carrier. Refer to the [Twilio Console](https://console.twilio.com/) and your invoices for actual usage and charges.
+Segment counts and encodings produced by this library and the browser calculator are estimates and are not a guarantee of how messages will be segmented or billed. Actual segmentation can vary by sender type, destination, and carrier. For a sent SMS, check the Message resource's [`numSegments` property](https://www.twilio.com/docs/messaging/api/message-resource#numsegments-property) or [Programmable Messaging Logs](https://www.twilio.com/docs/messaging/features/messaging-logs) for the actual segment count. Refer to your Twilio billing usage and invoices for actual charges.
 
 [twilio]: https://www.twilio.com
